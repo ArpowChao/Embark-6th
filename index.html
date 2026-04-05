@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embark 啟程 | 專題成果展</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo">Embark <span>啟程</span></a>
+            <ul class="nav-links">
+                <li><a href="#about">展覽理念</a></li>
+                <li><a href="#methods">活動辦法</a></li>
+                <li><a href="#schedule">活動時程</a></li>
+                <li><a href="#team">籌備團隊</a></li>
+                <li><a href="#resources">相關連結</a></li>
+            </ul>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="home" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="glass-panel slide-up">
+                <p class="subtitle">高雄市立三民高級中學．第六屆專題成果展</p>
+                <h1 class="title">Embark <span>啟程</span></h1>
+                <p class="tagline">歲月繁花裡的知性遠航</p>
+                <div class="divider"></div>
+                <p class="description">懷三分膽氣以探賾，擁七分細膩以索隱；<br>聚如星火匯流，散若流星爭輝。</p>
+                <a href="#about" class="btn primary-btn">翻閱詩篇 <i class="fas fa-book-open"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container fade-in">
+            <div class="section-header">
+                <h2>展覽初談 <span>Prologue</span></h2>
+                <div class="header-line"></div>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>循光而去的青春航紀</h3>
+                    <p>「啟程」，不僅是一場學術心血的落成，更是青春歲月裡一次浪漫的壯遊。在科學的嚴謹、科技的冷靜、人文的溫柔與藝術的靈動之間，我們以紙筆為舵，尋覓著屬於這個世界的解答。</p>
+                    <p>每一份專題，皆是學子們於浩瀚書海中探索的獨特航線。我們從四面八方匯集於此，秉持著「膽大心細」的求真之火，在未知的知識海域中「勇往前行」。待盛會將息之際，我們將帶著行囊裡的豐碩，揮別交錯的航道各奔東西，航向更為遼闊的星辰大海。</p>
+                </div>
+                <div class="about-image">
+                    <!-- Placeholder for an image or illustration -->
+                    <div class="image-placeholder"><i class="fas fa-compass"></i></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methods Section -->
+    <section id="methods" class="section alt-bg">
+        <div class="container fade-in">
+            <div class="section-header center">
+                <h2>規約與體制 <span>Regulations</span></h2>
+                <div class="header-line center-line"></div>
+                <p class="section-subtitle">如何參與這場研究之旅</p>
+            </div>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+                    <h3>參賽類別與組別</h3>
+                    <p>分為「一般發表」與「雙語發表」，向下細分「人社藝術」、「數理科學」、「工程與設計」三組。雙語組獎項獨立，為跨領域學習的一大亮點。</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
+                    <h3>初賽與決賽審查</h3>
+                    <p>初賽將針對「書面報告」與「實體簡報(5分鐘)」進行評比。決賽分為「海報決賽」與「研討會場發表(8-10分鐘)」，邀請大學教授親自擔任評審。</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-robot"></i></div>
+                    <h3>生成式 AI 使用規範</h3>
+                    <p>鼓勵合理使用 AI 作為輔助工具（如除錯、文法檢查），但嚴禁代筆、捏造數據或抄襲。所有參賽隊伍皆須簽署並繳交「AI 使用情形聲明書」。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="schedule" class="section">
+        <div class="container fade-in">
+            <div class="section-header">
+                <h2>歲月之軌 <span>Chronicle</span></h2>
+                <div class="header-line"></div>
+            </div>
+            
+            <div class="countdown-container">
+                <div class="countdown-status">
+                    <i class="fas fa-hourglass-half"></i> 
+                    <span id="current-phase">系統讀取時間中...</span>
+                </div>
+                <div class="countdown-timer" id="countdown-timer">
+                    <!-- Timer dynamically inserted via JS -->
+                </div>
+            </div>
+
+            <div class="timeline" id="timeline-events">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>報名與檔案上傳</h4>
+                        <span class="time">115年 04/27(一) - 05/15(五)</span>
+                        <p>請於《啟程》入口網站下載報名文檔，填寫表單並上傳成果報告書與簡介。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>校內實體初賽</h4>
+                        <span class="time">115年 05/27(三) 專題課程時間</span>
+                        <p>利用專題課程時間進行校內實體簡報初賽評比（5分鐘報告，全程錄影）。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>公布決賽名單與最終繳件</h4>
+                        <span class="time">115年 06/01(一) - 06/03(三)</span>
+                        <p>6/1中午公告入選決賽名單，入選組別需於6/3下午1點前繳交最終檔案（簡報、作品說明書）。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>決賽場地預演</h4>
+                        <span class="time">115年 06/22(一) 09:00</span>
+                        <p>進行成果展海報決賽與研討會場的場地佈置與預演準備。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>海報與研討會總決賽</h4>
+                        <span class="time">115年 06/29(一)</span>
+                        <p>上午進行海報組決賽，下午接力進行研討會場與專題成果展決賽，由大學教授擔任評審。</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>公告獲獎名單</h4>
+                        <span class="time">115年 06/30(二)</span>
+                        <p>於網站公告第6屆專題《啟程》特優、優選及佳作等獲獎名單。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="section">
+        <div class="container fade-in">
+            <div class="section-header">
+                <h2>執筆掌舵者 <span>The Committee</span></h2>
+                <div class="header-line"></div>
+                <p class="section-subtitle">幕後的策展匠人與推手</p>
+            </div>
+            
+            <div class="team-grid">
+                <!-- 總召/副總召 -->
+                <div class="team-card leader-card">
+                    <div class="team-role">總召集人</div>
+                    <div class="team-name">施潔妤</div>
+                </div>
+                <div class="team-card leader-card">
+                    <div class="team-role">副總召集人</div>
+                    <div class="team-name">林豊鈞</div>
+                </div>
+            </div>
+
+            <div class="team-grid members-grid" style="margin-top: 2rem;">
+                <!-- 群組 -->
+                <div class="team-group">
+                    <div class="group-title"><i class="fas fa-tasks"></i> 行政組</div>
+                    <ul class="group-members">
+                        <li class="head"><strong>組長：</strong>楊之安</li>
+                        <li><strong>組員：</strong>蔡詠竹</li>
+                    </ul>
+                </div>
+                
+                <div class="team-group">
+                    <div class="group-title"><i class="fas fa-calendar-alt"></i> 活動組</div>
+                    <ul class="group-members">
+                        <li class="head"><strong>組長：</strong>許菡庭</li>
+                        <li><strong>組員：</strong>許芯語、林宜霈</li>
+                    </ul>
+                </div>
+
+                <div class="team-group">
+                    <div class="group-title"><i class="fas fa-file-signature"></i> 文書組</div>
+                    <ul class="group-members">
+                        <li class="head"><strong>組長：</strong>李子勤</li>
+                        <li><strong>組員：</strong>陳家宜、蘇于榛</li>
+                    </ul>
+                </div>
+
+                <div class="team-group">
+                    <div class="group-title"><i class="fas fa-paint-brush"></i> 美宣組</div>
+                    <ul class="group-members">
+                        <li class="head"><strong>組長：</strong>張筱姍</li>
+                        <li><strong>組員：</strong>顏均庭、陳靜筠</li>
+                    </ul>
+                </div>
+
+                <div class="team-group">
+                    <div class="group-title"><i class="fas fa-tools"></i> 設備組</div>
+                    <ul class="group-members">
+                        <li class="head"><strong>組長：</strong>蘇郁淇</li>
+                        <li><strong>組員：</strong>王思婷</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="section alt-bg">
+        <div class="container fade-in">
+            <div class="section-header center">
+                <h2>文獻與規章 <span>E-Documents</span></h2>
+                <div class="header-line center-line"></div>
+                <p class="section-subtitle">點閱進入數位卷宗，探尋計畫詳情</p>
+            </div>
+            
+            <div class="resources-grid">
+                <a href="plan.html" class="resource-box">
+                    <i class="fas fa-scroll"></i>
+                    <h4>成果展實施計畫細則</h4>
+                    <p>線上翻閱報名規定與格式要點</p>
+                </a>
+                <a href="ai-rules.html" class="resource-box">
+                    <i class="fas fa-robot"></i>
+                    <h4>AI 使用倫理聲明卷</h4>
+                    <p>審視人工智慧與原創之界線</p>
+                </a>
+                <a href="plan.html#templates" class="resource-box">
+                    <i class="fas fa-pen-nib"></i>
+                    <h4>格式與章法範本</h4>
+                    <p>海報、簡介與書面報告之標準</p>
+                </a>
+            </div>
+
+            <div class="featured-images">
+                <div class="gallery-item"><div class="img-placeholder">圖片 1</div></div>
+                <div class="gallery-item"><div class="img-placeholder">圖片 2</div></div>
+                <div class="gallery-item"><div class="img-placeholder">圖片 3</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h3>Embark <span>啟程</span></h3>
+                <p>專題成果展 © 2026</p>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fas fa-globe"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
