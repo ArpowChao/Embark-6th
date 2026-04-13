@@ -90,15 +90,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. Dynamic Countdown & Timeline Logic
     const timelineData = [
-        { date: new Date('2026-04-27T00:00:00+08:00'), name: '開放報名與上傳檔案' },
+        { date: new Date('2026-04-27T00:00:00+08:00'), name: '開放報名與檔案上傳' },
         { date: new Date('2026-05-15T23:59:59+08:00'), name: '報名截止收件' },
         { date: new Date('2026-05-20T12:00:00+08:00'), name: '公告初賽審查時程' },
-        { date: new Date('2026-05-27T08:00:00+08:00'), name: '校內實體初賽開始' },
-        { date: new Date('2026-06-01T12:00:00+08:00'), name: '入選決賽名單公告' },
+        { date: new Date('2026-05-27T08:00:00+08:00'), name: '校內實體初賽' },
+        { date: new Date('2026-06-01T12:00:00+08:00'), name: '公告入選決賽名單' },
         { date: new Date('2026-06-03T13:00:00+08:00'), name: '決賽檔案繳交截止' },
-        { date: new Date('2026-06-22T09:00:00+08:00'), name: '大會場地預演' },
-        { date: new Date('2026-06-29T09:00:00+08:00'), name: '成果展年度總決賽' },
-        { date: new Date('2026-06-30T12:00:00+08:00'), name: '正式頒獎與落幕' }
+        { date: new Date('2026-06-22T09:00:00+08:00'), name: '決賽場地預演' },
+        { date: new Date('2026-06-29T09:00:00+08:00'), name: '海報決賽與成果展總決賽' },
+        { date: new Date('2026-06-30T12:00:00+08:00'), name: '公布獲獎名單' }
     ];
 
     const currentPhaseEl = document.getElementById('current-phase');
