@@ -165,4 +165,35 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCountdown(); // Run immediately
         setInterval(updateCountdown, 1000); // Update every second
     }
+
+    // 6. Registration Button Visibility Control
+    function checkRegistrationPeriod() {
+        const now = new Date();
+        const start = new Date('2026-04-27T00:00:00+08:00');
+        const end = new Date('2026-05-15T23:59:59+08:00');
+        
+        const registerBtnHero = document.getElementById('register-btn-hero');
+        const registerLinkSchedule = document.getElementById('register-link-schedule');
+        
+        const isRegistrationOpen = now >= start && now <= end;
+        
+        if (registerBtnHero) {
+            registerBtnHero.style.display = isRegistrationOpen ? 'inline-flex' : 'none';
+        }
+        
+        if (registerLinkSchedule) {
+            if (isRegistrationOpen) {
+                registerLinkSchedule.style.display = 'inline';
+            } else {
+                // 報名未開放時，將連結改為文字提示
+                registerLinkSchedule.style.display = 'inline';
+                registerLinkSchedule.style.pointerEvents = 'none';
+                registerLinkSchedule.style.color = '#999';
+                registerLinkSchedule.style.textDecoration = 'none';
+                registerLinkSchedule.innerText = '（報名尚未開放）';
+            }
+        }
+    }
+
+    checkRegistrationPeriod();
 });

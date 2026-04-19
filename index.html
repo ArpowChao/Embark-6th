@@ -42,7 +42,10 @@
                 <p class="tagline">歲月繁花裡的知性遠航</p>
                 <div class="divider"></div>
                 <p class="description">懷三分膽氣以探賾，擁七分細膩以索隱；<br>聚如星火匯流，散若流星爭輝。</p>
-                <a href="#about" class="btn primary-btn">翻閱詩篇 <i class="fas fa-book-open"></i></a>
+                <div class="hero-btns">
+                    <a href="#about" class="btn primary-btn">翻閱詩篇 <i class="fas fa-book-open"></i></a>
+                    <a href="https://forms.gle/8AsT85VvfUCtvggL9" target="_blank" id="register-btn-hero" class="btn secondary-btn">立即報名 <i class="fas fa-edit"></i></a>
+                </div>
             </div>
         </div>
     </header>
@@ -61,8 +64,7 @@
                     <p>每一份專題，皆是學子們於浩瀚書海中探索的獨特航線。我們從四面八方匯集於此，秉持著「膽大心細」的求真之火，在未知的知識海域中「勇往前行」。待盛會將息之際，我們將帶著行囊裡的豐碩，揮別交錯的航道各奔東西，航向更為遼闊的星辰大海。</p>
                 </div>
                 <div class="about-image">
-                    <!-- Placeholder for an image or illustration -->
-                    <div class="image-placeholder"><i class="fas fa-compass"></i></div>
+                    <img src="images/prologue.jpg" alt="專題成果展現場紀錄">
                 </div>
             </div>
         </div>
@@ -85,7 +87,7 @@
                 <div class="card">
                     <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
                     <h3>初賽與決賽審查</h3>
-                    <p>評比分為書面與實體兩大類。請務必將所有檔案（報告、簡報、簡介）<strong>轉存為 PDF 格式</strong>上傳。決賽由各領域大學教授親自擔任評審並進行專業問答。</p>
+                    <p>評比分為<strong>書面與實體</strong>兩大類。請務必將所有檔案（報告、簡報、海報、簡介）依據實施計畫辦法內容修正，並<strong>轉存為 PDF 格式</strong>上傳。決賽將邀請大學教授擔任評審，進行專業問答。</p>
                 </div>
                 <div class="card">
                     <div class="card-icon"><i class="fas fa-robot"></i></div>
@@ -120,7 +122,7 @@
                     <div class="timeline-content">
                         <h4>報名與檔案上傳</h4>
                         <span class="time">115年 04/27(一) - 05/15(五)</span>
-                        <p>透過專題入口網站下載報名文檔，並於 Google 表單上傳報告書、海報、簡報與簡介。</p>
+                        <p>透過專題入口網站下載報名文檔，並於 <a href="https://forms.gle/8AsT85VvfUCtvggL9" target="_blank" id="register-link-schedule" style="color: var(--primary-color); font-weight: bold; text-decoration: underline;">Google 報名表單</a> 上傳報告書、海報、簡報與簡介。</p>
                     </div>
                 </div>
                 <div class="timeline-item">
@@ -190,7 +192,7 @@
 
             <div class="team-grid members-grid" style="margin-top: 2rem;">
                 <!-- 群組 -->
-                <div class="team-group">
+                <div class="team-card">
                     <div class="group-title"><i class="fas fa-tasks"></i> 行政組</div>
                     <ul class="group-members">
                         <li class="head"><strong>組長：</strong>楊之安</li>
@@ -198,7 +200,7 @@
                     </ul>
                 </div>
                 
-                <div class="team-group">
+                <div class="team-card">
                     <div class="group-title"><i class="fas fa-calendar-alt"></i> 活動組</div>
                     <ul class="group-members">
                         <li class="head"><strong>組長：</strong>許菡庭</li>
@@ -206,7 +208,7 @@
                     </ul>
                 </div>
 
-                <div class="team-group">
+                <div class="team-card">
                     <div class="group-title"><i class="fas fa-file-signature"></i> 文書組</div>
                     <ul class="group-members">
                         <li class="head"><strong>組長：</strong>李子勤</li>
@@ -214,7 +216,7 @@
                     </ul>
                 </div>
 
-                <div class="team-group">
+                <div class="team-card">
                     <div class="group-title"><i class="fas fa-paint-brush"></i> 美宣組</div>
                     <ul class="group-members">
                         <li class="head"><strong>組長：</strong>張筱姍</li>
@@ -222,12 +224,28 @@
                     </ul>
                 </div>
 
-                <div class="team-group">
+                <div class="team-card">
                     <div class="group-title"><i class="fas fa-tools"></i> 設備組</div>
                     <ul class="group-members">
                         <li class="head"><strong>組長：</strong>蘇郁淇</li>
                         <li><strong>組員：</strong>王思婷</li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- 指導與顧問 -->
+            <div class="team-grid mentors-grid">
+                <div class="team-card mentor-card">
+                    <div class="team-role">指導單位</div>
+                    <div class="team-name">教學組長 林泓丞老師</div>
+                </div>
+                <div class="team-card mentor-card">
+                    <div class="team-role">顧問</div>
+                    <div class="team-name">設備組長 謝孟翔老師</div>
+                </div>
+                <div class="team-card mentor-card">
+                    <div class="team-role">專題召集人</div>
+                    <div class="team-name">物理科 趙晋鴻老師</div>
                 </div>
             </div>
         </div>
@@ -243,27 +261,75 @@
             </div>
             
             <div class="resources-grid">
-                <a href="plan.html" class="resource-box">
-                    <i class="fas fa-scroll"></i>
-                    <h4>成果展實施計畫細則</h4>
-                    <p>線上翻閱報名規定與格式要點</p>
+                <a href="https://drive.google.com/uc?export=download&id=1QKRfqfcxfHwYjBc1NlU03ayxGvBtR1gK" class="resource-box download-link" target="_blank">
+                    <i class="fas fa-file-pdf"></i>
+                    <h4>成果展實施計畫</h4>
+                    <p>完整競賽時程與規則說明</p>
+                    <span class="download-badge">立即下載</span>
                 </a>
-                <a href="ai-rules.html" class="resource-box">
-                    <i class="fas fa-robot"></i>
-                    <h4>AI 使用倫理聲明卷</h4>
-                    <p>審視人工智慧與原創之界線</p>
+                <a href="https://drive.google.com/uc?export=download&id=1diDE9ANA9zoOyle0E0ma29jdh3tLFDWx" class="resource-box download-link" target="_blank">
+                    <i class="fas fa-file-word"></i>
+                    <h4>附件一、成果報告書</h4>
+                    <p>書面報告撰寫格式範本 (Word)</p>
+                    <span class="download-badge">立即下載</span>
                 </a>
-                <a href="plan.html#templates" class="resource-box">
-                    <i class="fas fa-pen-nib"></i>
-                    <h4>格式與章法範本</h4>
-                    <p>海報、簡介與書面報告之標準</p>
+                <a href="https://drive.google.com/uc?export=download&id=1wglRkKuIMFSdnRdE-IeeBIRMwWQX5FCE" class="resource-box download-link" target="_blank">
+                    <i class="fas fa-file-contract"></i>
+                    <h4>附件二、AI 使用聲明書</h4>
+                    <p>生成式人工智慧倫理聲明表</p>
+                    <span class="download-badge">立即下載</span>
+                </a>
+                <a href="https://drive.google.com/uc?export=download&id=1QUtxjHs24tNz3Xyxg-Yj87qM5xD1HAib" class="resource-box download-link" target="_blank">
+                    <i class="fas fa-file-alt"></i>
+                    <h4>數學科撰寫範本</h4>
+                    <p>Catalan 數作品說明書參考</p>
+                    <span class="download-badge">立即下載</span>
                 </a>
             </div>
 
-            <div class="featured-images">
-                <div class="gallery-item"><div class="img-placeholder">圖片 1</div></div>
-                <div class="gallery-item"><div class="img-placeholder">圖片 2</div></div>
-                <div class="gallery-item"><div class="img-placeholder">圖片 3</div></div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="section">
+        <div class="container fade-in">
+            <div class="section-header center">
+                <h2>成果剪影 <span>Gallery</span></h2>
+                <div class="header-line center-line"></div>
+                <p class="section-subtitle">捕捉研究過程中的精彩瞬間</p>
+            </div>
+            
+            <div class="gallery-sub-section">
+                <h3 class="gallery-sub-title"><i class="fas fa-seedling"></i> 初啼競賽：初試啼聲</h3>
+                <div class="gallery-grid">
+                    <div class="gallery-item main-item">
+                        <img src="images/gallery2.jpg" alt="初啼競賽全體合照">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="images/gallery1.jpg" alt="學生發表細節">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="images/gallery3.jpg" alt="初啼競賽合照">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="images/gallery4.jpg" alt="初啼競賽合照">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="images/gallery5.jpg" alt="初啼競賽合照">
+                    </div>
+                </div>
+            </div>
+
+            <div class="gallery-sub-section" style="margin-top: 4rem;">
+                <h3 class="gallery-sub-title"><i class="fas fa-anchor"></i> 成果展現：啟程盛會</h3>
+                <div class="gallery-grid">
+                    <div class="gallery-item placeholder-item">
+                        <div class="gallery-placeholder">
+                            <i class="fas fa-camera"></i>
+                            <p>活動進行中，照片即將更新...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -284,5 +350,17 @@
     </footer>
 
     <script src="js/script.js"></script>
+
+    <!-- Floating Inquiry Bubble -->
+    <div class="floating-inquiry">
+        <i class="fas fa-question-circle"></i>
+        <p>專題問題請洽教務處教學組 趙老師</p>
+    </div>
+
+    <!-- Floating IG Button -->
+    <a href="https://www.instagram.com/smhs_isp6?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="floating-ig">
+        <img src="images/ig-logo.jpg" alt="Follow us on Instagram">
+        <span class="ig-tooltip">Follow Us</span>
+    </a>
 </body>
 </html>
