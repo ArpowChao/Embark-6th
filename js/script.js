@@ -166,16 +166,18 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(updateCountdown, 1000); // Update every second
     }
 
-    // 6. Registration Button Visibility Control
-    function checkRegistrationPeriod() {
+    // 6. Registration & Correction Button Visibility Control
+    function checkVisibilityPeriods() {
         const now = new Date();
-        const start = new Date('2026-04-27T00:00:00+08:00');
-        const end = new Date('2026-05-15T23:59:59+08:00');
+        
+        // Registration Period
+        const regStart = new Date('2026-04-27T00:00:00+08:00');
+        const regEnd = new Date('2026-05-15T23:59:59+08:00');
         
         const registerBtnHero = document.getElementById('register-btn-hero');
         const registerLinkSchedule = document.getElementById('register-link-schedule');
         
-        const isRegistrationOpen = now >= start && now <= end;
+        const isRegistrationOpen = now >= regStart && now <= regEnd;
         
         if (registerBtnHero) {
             registerBtnHero.style.display = isRegistrationOpen ? 'inline-flex' : 'none';
@@ -185,15 +187,44 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isRegistrationOpen) {
                 registerLinkSchedule.style.display = 'inline';
             } else {
-                // 報名未開放時，將連結改為文字提示
-                registerLinkSchedule.style.display = 'inline';
-                registerLinkSchedule.style.pointerEvents = 'none';
+                registerLinkSchedule.innerText = '（報名已截止）';
                 registerLinkSchedule.style.color = '#999';
-                registerLinkSchedule.style.textDecoration = 'none';
-                registerLinkSchedule.innerText = '（報名尚未開放）';
+                registerLinkSchedule.style.pointerEvents = 'none';
+            }
+        }
+
+        // Correction Period: 5/16 23:00 - 5/18 23:59
+        const corrStart = new Date('2026-05-16T23:00:00+08:00');
+        const corrEnd = new Date('2026-05-18T23:59:59+08:00');
+        
+        const correctionSection = document.getElementById('correction-announcement');
+        const isCorrectionPeriod = now >= corrStart && now <= corrEnd;
+        const isAfterCorrection = now > corrEnd;
+
+        if (correctionSection) {
+            if (isAfterCorrection) {
+                // If past the correction period, we can either hide it or change the button
+                const corrBtn = correctionSection.querySelector('.btn');
+                const corrTime = correctionSection.querySelector('.time-range');
+                if (corrBtn) {
+                    corrBtn.innerText = '補件已截止';
+                    corrBtn.classList.remove('primary-btn', 'pulse-anim');
+                    corrBtn.style.background = '#999';
+                    corrBtn.style.pointerEvents = 'none';
+                }
+                if (corrTime) {
+                    corrTime.innerHTML = '<i class="fas fa-calendar-times"></i> 補件時段已結束';
+                }
+            } else if (!isCorrectionPeriod && now < corrStart) {
+                // If before correction period, maybe hide or show "Coming soon"
+                correctionSection.style.display = 'none';
+            } else {
+                correctionSection.style.display = 'block';
             }
         }
     }
 
-    checkRegistrationPeriod();
+    checkVisibilityPeriods();
+    // Re-check every minute to update status dynamically
+    setInterval(checkVisibilityPeriods, 60000);
 });
