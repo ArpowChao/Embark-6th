@@ -1260,11 +1260,17 @@ footer {
     box-shadow: 0 4px 10px rgba(255, 140, 66, 0.3);
 }
 
-.ins-text strong {
+.ins-text > strong {
     font-size: 1.2rem;
     color: var(--text-main);
     display: block;
     margin-bottom: 0.5rem;
+}
+
+.ins-text p strong {
+    display: inline;
+    color: var(--primary-color);
+    font-size: inherit;
 }
 
 .ins-text p {
