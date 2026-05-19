@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timelineData = [
         { date: new Date('2026-04-27T00:00:00+08:00'), name: '開放報名與檔案上傳' },
         { date: new Date('2026-05-15T23:59:59+08:00'), name: '報名截止收件' },
-        { date: new Date('2026-05-20T12:00:00+08:00'), name: '公告初賽審查時程' },
+        { date: new Date('2026-05-20T08:00:00+08:00'), name: '公告初賽審查時間' },
         { date: new Date('2026-05-27T08:00:00+08:00'), name: '校內實體初賽' },
         { date: new Date('2026-06-01T12:00:00+08:00'), name: '公告入選決賽名單' },
         { date: new Date('2026-06-03T13:00:00+08:00'), name: '決賽檔案繳交截止' },
@@ -220,6 +220,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 correctionSection.style.display = 'none';
             } else {
                 correctionSection.style.display = 'block';
+            }
+        }
+        
+        // Selection Announcement Period: Reveals after 5/20 8:00 AM
+        const selectionAnnounceTime = new Date('2026-05-20T08:00:00+08:00');
+        const selectionDetails = document.getElementById('selection-details');
+        
+        if (selectionDetails) {
+            if (now < selectionAnnounceTime) {
+                selectionDetails.style.display = 'none';
+            } else {
+                selectionDetails.style.display = 'block';
             }
         }
     }
