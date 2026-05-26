@@ -186,8 +186,63 @@
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
                         <h4>校內實體初賽</h4>
-                        <span class="time">115年 05/27(三) 專題課程時間 &nbsp;|&nbsp; <i class="fas fa-map-marker-alt" style="color: var(--secondary-color);"></i> 實體審查地點待公告</span>
-                        <p>5/20 上午 8:00 公告初賽審查時間。利用課堂進行 5 分鐘簡報初賽（不進行問答，全程錄影）。</p>
+                        <span class="time">115年 05/27(三) 專題課程時間 &nbsp;|&nbsp; <i class="fas fa-map-marker-alt" style="color: #e63946;"></i> 實體審查地點已公布</span>
+                        <p>利用課堂進行 5 分鐘簡報初賽（不進行問答，全程錄影）。請參考以下場地地點、試用說明與報告注意事項。</p>
+
+                        <!-- Onsite preliminary round locations -->
+                        <div class="prelim-locations-grid">
+                            <div class="prelim-location-card art">
+                                <div class="loc-badge">人社藝術</div>
+                                <div class="loc-room"><i class="fas fa-palette"></i> 潛能開發教室</div>
+                            </div>
+                            <div class="prelim-location-card science">
+                                <div class="loc-badge">數理科學</div>
+                                <div class="loc-room"><i class="fas fa-atom"></i> 雲端漫遊教室</div>
+                            </div>
+                            <div class="prelim-location-card engineering">
+                                <div class="loc-badge">工程與設計</div>
+                                <div class="loc-room"><i class="fas fa-laptop-code"></i> 英文互動教室</div>
+                            </div>
+                        </div>
+
+                        <!-- Trial / Pre-test notification box -->
+                        <div class="prelim-notice-banner">
+                            <div class="notice-icon"><i class="fas fa-chalkboard-user"></i></div>
+                            <div class="notice-text">
+                                <strong>5/27(三) 早自習起</strong>，可至 <strong>3F 視聽教室</strong> 查看簡報並試用簡報筆（現場不提供修改簡報服務）。
+                            </div>
+                        </div>
+
+                        <!-- Presentation Notes Checklist -->
+                        <div class="prelim-notes-box">
+                            <h5><i class="fas fa-clipboard-list"></i> 報告注意事項</h5>
+                            <ul class="notes-list">
+                                <li>
+                                    <i class="fas fa-circle-nodes icon-blue"></i>
+                                    <span><strong>簡報系統：</strong>電腦不連網不操作，簡報檔案已經串接，一直簡報筆按下一頁即可。</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-microphone icon-orange"></i>
+                                    <span><strong>現場設備：</strong>現場提供報告者『麥克風、簡報筆』。</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-play icon-green"></i>
+                                    <span><strong>開始報告：</strong>聽到：『報告組別為編號○○…』後，開始進行報告。</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-bell icon-red"></i>
+                                    <span><strong>報告時間：</strong>時間約 <strong>5 分鐘</strong>。<strong>4:30</strong> 短鈴 1 聲提醒，<strong>5:30</strong> 長鈴請立即停止並離場。</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-video icon-purple"></i>
+                                    <span><strong>影音授權：</strong>報告過程會全程錄影。如表現優良，是否同意授權剪輯影片作為優秀範例？</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-school icon-teal"></i>
+                                    <span><strong>後續行程：</strong>報告結束後請盡快返回專題課程教室（三、四節）或班級教室（午休）上課。</span>
+                                </li>
+                            </ul>
+                        </div>
 
                         <details class="timeline-details" open id="selection-details">
                             <summary><i class="fas fa-bullhorn"></i> 初選名單與審查時間公告</summary>
@@ -239,7 +294,7 @@
 
                                 <div class="gallery-sub-title" style="justify-content: center; margin-top: 3rem;"><i class="fas fa-list-ol"></i> 初選分組名單公告</div>
                                 <div class="group-list-container" style="margin-top: 0;">
-                                    <img src="images/圖片3.jpg" alt="分組名單公告" class="group-list-img">
+                                    <img src="images/group_list.jpg" alt="分組名單公告" class="group-list-img">
                                     <p class="img-caption"><i class="fas fa-search"></i> 點擊可放大查看完整名單</p>
                                 </div>
                             </div>
@@ -475,5 +530,12 @@
         <img src="images/ig-logo.jpg" alt="Follow us on Instagram">
         <span class="ig-tooltip">Follow Us</span>
     </a>
+
+    <!-- Lightbox Modal for Image Zooming -->
+    <div id="lightbox-modal" class="lightbox-modal">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" alt="放大圖片">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
 </body>
 </html>

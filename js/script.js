@@ -223,20 +223,56 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Selection Announcement Period: Reveals after 5/20 8:00 AM
-        const selectionAnnounceTime = new Date('2026-05-20T08:00:00+08:00');
+        // Selection Announcement Period: Always show the details
         const selectionDetails = document.getElementById('selection-details');
-        
         if (selectionDetails) {
-            if (now < selectionAnnounceTime) {
-                selectionDetails.style.display = 'none';
-            } else {
-                selectionDetails.style.display = 'block';
-            }
+            selectionDetails.style.display = '';
         }
     }
 
     checkVisibilityPeriods();
     // Re-check every minute to update status dynamically
     setInterval(checkVisibilityPeriods, 60000);
+
+    // 7. Lightbox Modal for Zooming Images
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxClose = document.querySelector('.lightbox-close');
+
+    if (lightboxModal && lightboxImg) {
+        // Collect all images that should be zoomable
+        const zoomImages = document.querySelectorAll('.zoomable-img, .status-table-img, .group-list-img, .gallery-item img, .about-image img');
+        
+        zoomImages.forEach(img => {
+            img.addEventListener('click', (e) => {
+                e.stopPropagation();
+                lightboxModal.classList.add('show');
+                lightboxImg.src = img.src;
+                lightboxCaption.textContent = img.alt || '圖片放大檢視';
+                document.body.style.overflow = 'hidden'; // Disable page scrolling
+            });
+        });
+
+        // Close functions
+        const closeLightbox = () => {
+            lightboxModal.classList.remove('show');
+            document.body.style.overflow = ''; // Enable page scrolling
+        };
+
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightboxModal.addEventListener('click', closeLightbox);
+        
+        // Prevent closing when clicking the image itself
+        lightboxImg.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Escape key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lightboxModal.classList.contains('show')) {
+                closeLightbox();
+            }
+        });
+    }
 });
