@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初選結果公告與查詢系統 | Embark 啟程</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header {
+            padding: 8rem 0 4rem 0;
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(59, 130, 246, 0.05));
+            text-align: center;
+        }
+        .page-title {
+            font-size: 3rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+        }
+        .content-container {
+            max-width: 1100px;
+            margin: -2rem auto 4rem auto;
+            background: #fff;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 10;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Stats Cards Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(240, 244, 248, 0.5));
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+        .stat-num {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 0.2rem;
+        }
+        .stat-num.finalist { color: #D4AF37; } /* Gold */
+        .stat-num.conference { color: #10B981; } /* Emerald */
+        .stat-num.poster { color: #3B82F6; } /* Sky Blue */
+        
+        .stat-label {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        .stat-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Search and Filter Panel */
+        .control-panel {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+        }
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.8rem;
+            border: 1px solid #CBD5E1;
+            border-radius: 30px;
+            font-size: 1rem;
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.15);
+        }
+        .clear-btn {
+            background: #E2E8F0;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .clear-btn:hover {
+            background: #CBD5E1;
+        }
+
+        /* Filters Row */
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .filter-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        .filter-btn {
+            background: #fff;
+            border: 1px solid #CBD5E1;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-main);
+        }
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .filter-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Tabs Selection */
+        .tabs-container {
+            display: flex;
+            border-bottom: 2px solid #E2E8F0;
+            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+        .tab-btn.active {
+            color: var(--primary-color);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        .tab-count {
+            font-size: 0.8rem;
+            background: rgba(33, 158, 188, 0.1);
+            color: var(--secondary-color);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+        .tab-btn.active .tab-count {
+            background: rgba(255, 140, 66, 0.15);
+            color: var(--primary-color);
+        }
+
+        /* Results Table */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            margin-bottom: 2.5rem;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 1rem;
+        }
+        .results-table th, .results-table td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .results-table th {
+            background-color: #F8FAFC;
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+        .results-table tbody tr {
+            transition: var(--transition);
+        }
+        .results-table tbody tr:hover {
+            background-color: rgba(59, 130, 246, 0.02);
+        }
+        .results-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Badges styling */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        .badge.type-general { background-color: #F1F5F9; color: #475569; }
+        .badge.type-bilingual { background-color: #EEF2FF; color: #4F46E5; border: 1px solid rgba(79, 70, 229, 0.15); }
+        
+        .badge.group-eng { background-color: #FEF3C7; color: #D97706; } /* engineering */
+        .badge.group-art { background-color: #FCE7F3; color: #DB2777; } /* arts */
+        .badge.group-sci { background-color: #E0F2FE; color: #0284C7; } /* science */
+
+        .badge.status-final {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #B45309;
+            border: 1px solid rgba(180, 83, 9, 0.2);
+            box-shadow: 0 2px 4px rgba(180, 83, 9, 0.05);
+        }
+        .badge.status-conf {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: #065F46;
+            border: 1px solid rgba(6, 95, 70, 0.2);
+        }
+        .badge.status-post {
+            background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+            color: #0369A1;
+            border: 1px solid rgba(3, 105, 161, 0.2);
+        }
+
+        /* Notes and Instructions Section */
+        .notice-container {
+            background: rgba(255, 140, 66, 0.05);
+            border-left: 4px solid var(--primary-color);
+            padding: 2rem;
+            border-radius: 0 16px 16px 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .notice-container h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+        .notice-list {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .notice-list li {
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--text-main);
+        }
+        .email-action-box {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+        }
+        .email-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            user-select: all;
+        }
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+        .action-btn.copy {
+            background: #F1F5F9;
+            color: #475569;
+        }
+        .action-btn.copy:hover {
+            background: #E2E8F0;
+        }
+        .action-btn.send {
+            background: var(--secondary-color);
+            color: #fff;
+        }
+        .action-btn.send:hover {
+            background: #2563EB;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        .no-results i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            color: #CBD5E1;
+        }
+
+        /* Timeline Box for deadlines */
+        .deadline-timeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .deadline-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 1.2rem;
+            border-radius: 12px;
+            position: relative;
+        }
+        .deadline-card.highlight {
+            border-color: #F87171;
+            background: rgba(239, 68, 68, 0.02);
+        }
+        .deadline-card .date {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        .deadline-card.highlight .date {
+            color: #EF4444;
+        }
+        .deadline-card .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--text-main);
+        }
+        .deadline-card .desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 992px) {
+            .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .deadline-timeline { grid-template-columns: 1fr; gap: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .content-container { padding: 1.5rem; border-radius: 0; margin-top: 0; box-shadow: none; }
+            .search-row { flex-direction: column; }
+            .filters-row { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .results-table th:nth-child(2), .results-table td:nth-child(2) { display: none; } /* Hide type on mobile to save space */
+            
+            /* Responsive table stack-like styling on very small screens */
+            /* We'll keep default table scroll wrapper, it is robust. */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Embark <span>啟程</span></a>
+            <a href="index.html" class="btn primary-btn" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">返回首頁</a>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">初選結果公告與查詢</h1>
+            <p class="section-subtitle">高雄市立三民高級中學．第六屆專題成果展《啟程》</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="content-container">
+            
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> 回望來時路</a>
+
+            <!-- Announcement Notice -->
+            <div class="notice-container">
+                <h3><i class="fas fa-exclamation-triangle"></i> 進決賽組別與研討會分享組別注意事項</h3>
+                <ul class="notice-list">
+                    <li><strong>報告時間：</strong>簡報時間均為 <strong>8 - 10 分鐘</strong>，決賽會場另有評審教授問答 <strong>3 - 5 分鐘</strong>。</li>
+                    <li><strong>檔案修正：</strong>若需修正研究成果報告書或簡報，請於 <strong>6/5 (五) 20:00 前</strong> 繳交（寄送至下述信箱）。逾期未寄，視同不修正，將以初賽版本送交決賽。</li>
+                    <li><strong>海報輸出：</strong>海報展決賽之海報將由學校依據先前繳交之海報檔案統一送印，不開放再修正。</li>
+                </ul>
+                
+                <div class="email-action-box">
+                    <div>
+                        <span class="filter-label" style="display: block; margin-bottom: 3px;">收件信箱：</span>
+                        <span class="email-text" id="email-address">arpowchaosun@smhs.kh.edu.tw</span>
+                    </div>
+                    <div class="action-btns">
+                        <button class="action-btn copy" onclick="copyEmail()"><i class="fas fa-copy"></i> 複製信箱</button>
+                        <button class="action-btn send" id="send-email-btn" onclick="sendEmail()"><i class="fas fa-envelope"></i> 撰寫郵件</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Dashboard -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-num finalist" id="count-finalist">0</div>
+                    <div class="stat-label">🏆 晉級決賽</div>
+                    <div class="stat-desc">口頭發表 + 教授提問問答</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num conference" id="count-conference">0</div>
+                    <div class="stat-label">🎙️ 研討會分享</div>
+                    <div class="stat-desc">學術成果分享與口頭報告</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num poster" id="count-poster">0</div>
+                    <div class="stat-label">🖼️ 海報展覽</div>
+                    <div class="stat-desc">未入選決賽組之實體海報評比</div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('all')">全部結果 <span class="tab-count" id="badge-all">0</span></button>
+                <button class="tab-btn" onclick="switchTab('finalist')">🏆 晉級決賽 <span class="tab-count" id="badge-finalist">0</span></button>
+                <button class="tab-btn" onclick="switchTab('conference')">🎙️ 研討會分享 <span class="tab-count" id="badge-conference">0</span></button>
+                <button class="tab-btn" onclick="switchTab('poster')">🖼️ 海報展覽 <span class="tab-count" id="badge-poster">0</span></button>
+            </div>
+
+            <!-- Control & Filtering Panel -->
+            <div class="control-panel">
+                <div class="search-row">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="search-input" id="search-input" placeholder="輸入編號、作品名稱搜尋..." oninput="handleSearch()">
+                    </div>
+                    <button class="clear-btn" onclick="clearFilters()"><i class="fas fa-undo"></i> 重設條件</button>
+                </div>
+                
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <span class="filter-label">學科領域：</span>
+                        <button class="filter-btn active" data-filter="group" data-value="all" onclick="setFilter('group', 'all')">全部</button>
+                        <button class="filter-btn" data-filter="group" data-value="工程與設計" onclick="setFilter('group', '工程與設計')">工程與設計</button>
+                        <button class="filter-btn" data-filter="group" data-value="人社藝術" onclick="setFilter('group', '人社藝術')">人社藝術</button>
+                        <button class="filter-btn" data-filter="group" data-value="數理科學" onclick="setFilter('group', '數理科學')">數理科學</button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <span class="filter-label">語系分類：</span>
+                        <button class="filter-btn active" data-filter="lang" data-value="all" onclick="setFilter('lang', 'all')">全部</button>
+                        <button class="filter-btn" data-filter="lang" data-value="一般" onclick="setFilter('lang', '一般')">一般組</button>
+                        <button class="filter-btn" data-filter="lang" data-value="雙語" onclick="setFilter('lang', '雙語')">雙語組</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Table Container -->
+            <div class="table-responsive">
+                <table class="results-table" id="results-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">編號</th>
+                            <th style="width: 100px;">發表類型</th>
+                            <th style="width: 150px;">學科組別</th>
+                            <th>作品名稱</th>
+                            <th style="width: 150px;">初選結果</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Javascript dynamically generates rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Timeline of Important Deadlines -->
+            <h3 style="font-size: 1.5rem; color: var(--text-main); margin-bottom: 1rem;"><i class="fas fa-calendar-alt"></i> 下階段重要時程</h3>
+            <div class="deadline-timeline">
+                <div class="deadline-card">
+                    <span class="date">6/01 (一) 12:00</span>
+                    <h4 class="title">結果正式公告</h4>
+                    <p class="desc">初選名單於網站與校內同步公告開放查詢。</p>
+                </div>
+                <div class="deadline-card highlight">
+                    <span class="date">6/05 (五) 20:00</span>
+                    <h4 class="title">檔案修正截止</h4>
+                    <p class="desc">決賽簡報與報告修正 PDF 寄達 arpowchaosun@smhs.kh.edu.tw，逾期視同不修改。</p>
+                </div>
+                <div class="deadline-card">
+                    <span class="date">6/29 (一) 09:00</span>
+                    <h4 class="title">成果展總決賽</h4>
+                    <p class="desc">上午海報展覽評比；下午成果展決賽（教授問答）及研討會分享。</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h3>Embark <span>啟程</span></h3>
+                <p>專題成果展 © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script Section -->
+    <script>
+        // Full Dataset
+        const projects = [
+            // 工程與設計
+            { id: "E01", lang: "一般", group: "工程與設計", title: "隔熱磚的秘密", isFinalist: false, isConference: false, isPoster: true },
+            { id: "E02", lang: "一般", group: "工程與設計", title: "空拍機巡弋-看見高雄(看見三民高中)", isFinalist: false, isConference: false, isPoster: true },
+            { id: "E03", lang: "一般", group: "工程與設計", title: "綠能(太陽能)繫留無人機之研究與控制", isFinalist: false, isConference: false, isPoster: true },
+            { id: "E04", lang: "一般", group: "工程與設計", title: "「慧眼識空」：智能影像空氣品質監測", isFinalist: false, isConference: false, isPoster: true },
+            { id: "E05", lang: "一般", group: "工程與設計", title: "自製空氣清靜機", isFinalist: false, isConference: false, isPoster: true },
+            { id: "E06", lang: "一般", group: "工程與設計", title: "讓光拐彎，水管中的光之旅", isFinalist: false, isConference: false, isPoster: true },
+            { id: "E07", lang: "一般", group: "工程與設計", title: "AI聽診器：探討回收物的材質碰撞聲紋辨識", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E08", lang: "一般", group: "工程與設計", title: "電腦用穿戴式手部輸入裝置", isFinalist: true, isConference: false, isPoster: false },
+            { id: "E09", lang: "一般", group: "工程與設計", title: "智慧校園點名系統", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E10", lang: "一般", group: "工程與設計", title: "校園標誌與行人安全即時偵測系統", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E11", lang: "一般", group: "工程與設計", title: "基於SMC策略之量化交易研究：從主觀盤感到量化交易的績效驗證", isFinalist: false, isConference: false, isPoster: true },
+            { id: "E12", lang: "一般", group: "工程與設計", title: "看不見的危機-從都市地理環境探討空氣品質", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E13", lang: "一般", group: "工程與設計", title: "『風』度翩翩-太陽能溫濕度自動調控風扇", isFinalist: true, isConference: false, isPoster: false },
+            { id: "E14", lang: "一般", group: "工程與設計", title: "水安通：零時差水位即時警告系統", isFinalist: true, isConference: false, isPoster: false },
+            { id: "E15", lang: "一般", group: "工程與設計", title: "隱形電池", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E16", lang: "一般", group: "工程與設計", title: "碳為觀止-探討生物炭混泥土之吸碳能力", isFinalist: true, isConference: false, isPoster: false },
+            { id: "E17", lang: "一般", group: "工程與設計", title: "智慧電網-綠能即時調度系統", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E18", lang: "一般", group: "工程與設計", title: "氣候變遷下高屏溪洪水風險之GIS模擬", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E19", lang: "一般", group: "工程與設計", title: "變廢為寶--抓住指間流走的熱", isFinalist: false, isConference: true, isPoster: true },
+            { id: "E20", lang: "一般", group: "工程與設計", title: "異質柏油材料影響熱島效應之探討", isFinalist: true, isConference: false, isPoster: false },
+            { id: "E21", lang: "一般", group: "工程與設計", title: "水解「黴」學-混紡衣物水解之研究", isFinalist: true, isConference: false, isPoster: false },
+            { id: "EB01", lang: "雙語", group: "工程與設計", title: "從發電到儲電：智慧太陽能新策略", isFinalist: true, isConference: false, isPoster: false },
+
+            // 人社藝術
+            { id: "L01", lang: "一般", group: "人社藝術", title: "博物館收藏:如何在「保存、展示與歷史正義」之間取得平衡──以大英博物館帕德嫩神廟爭議為例", isFinalist: false, isConference: true, isPoster: true },
+            { id: "L02", lang: "一般", group: "人社藝術", title: "美國H-2A制度對農業勞力供應之影響：以加州草莓產業為例", isFinalist: true, isConference: false, isPoster: false },
+            { id: "L03", lang: "一般", group: "人社藝術", title: "青少年對安樂死之態度及其影響因素之研究", isFinalist: false, isConference: false, isPoster: true },
+            { id: "L04", lang: "一般", group: "人社藝術", title: "青少年戀愛心理學", isFinalist: false, isConference: false, isPoster: true },
+            { id: "L05", lang: "一般", group: "人社藝術", title: "同一所學校內不同運動空間的使用差異", isFinalist: false, isConference: true, isPoster: true },
+            { id: "L06", lang: "一般", group: "人社藝術", title: "探討鐵路地下化對三塊厝地區之經濟效益與空間轉型的影響", isFinalist: false, isConference: true, isPoster: true },
+            { id: "L07", lang: "一般", group: "人社藝術", title: "當代高中生的心理健康問題", isFinalist: false, isConference: false, isPoster: true },
+            { id: "L08", lang: "一般", group: "人社藝術", title: "科工館的策展規劃&永續發展", isFinalist: false, isConference: false, isPoster: true },
+            { id: "L09", lang: "一般", group: "人社藝術", title: "高雄市覆鼎金保安宮研究", isFinalist: false, isConference: false, isPoster: true },
+            { id: "L10", lang: "一般", group: "人社藝術", title: "南部工業重鎮?從聚集經濟的方面望向大發工業區與廢五金行業之印證", isFinalist: false, isConference: false, isPoster: true },
+            { id: "L11", lang: "一般", group: "人社藝術", title: "投資知識知多少？高中生金融投資認知與課程需求之研究  -以高雄市三民高中為例", isFinalist: true, isConference: false, isPoster: false },
+            { id: "L12", lang: "一般", group: "人社藝術", title: "從學生的角度深入輔導室–和學生的關係利弊和學生求助傾向", isFinalist: false, isConference: false, isPoster: true },
+            { id: "L13", lang: "一般", group: "人社藝術", title: "美國關稅政策影響台灣半導體與中國高科技產業的雙軌發展", isFinalist: true, isConference: false, isPoster: false },
+            { id: "L14", lang: "一般", group: "人社藝術", title: "投？不投? 我國公投議題與公民投票意願之探討 —以高雄市三民高中學生為例", isFinalist: true, isConference: false, isPoster: false },
+            { id: "L15", lang: "一般", group: "人社藝術", title: "在零工經濟崛起下台灣的外送員及Uber司機的勞權問題——以美國Prop22公投案為例", isFinalist: false, isConference: true, isPoster: true },
+            { id: "L16", lang: "一般", group: "人社藝術", title: "從音樂活動到城市經濟:以高雄世運演唱會為例", isFinalist: false, isConference: true, isPoster: true },
+            { id: "L17", lang: "一般", group: "人社藝術", title: "探討青少年消費糾紛――以高中生為主", isFinalist: false, isConference: true, isPoster: true },
+            { id: "L18", lang: "一般", group: "人社藝術", title: "探討生成式AI對青少年學習的影響—以三民高中為例", isFinalist: false, isConference: true, isPoster: true },
+            { id: "L19", lang: "一般", group: "人社藝術", title: "人類對AI生成作品之判別能力", isFinalist: true, isConference: false, isPoster: false },
+            { id: "L20", lang: "一般", group: "人社藝術", title: "誰的二二八？不同世代對二二八事件的記憶與理解", isFinalist: true, isConference: false, isPoster: false },
+            { id: "L21", lang: "一般", group: "人社藝術", title: "圖像與情緒投射--青少年在自由繪畫中的情緒線索", isFinalist: true, isConference: false, isPoster: false },
+            { id: "L22", lang: "一般", group: "人社藝術", title: "台灣城鄉資訊能力落差之原因探討", isFinalist: false, isConference: true, isPoster: true },
+            { id: "LB01", lang: "雙語", group: "人社藝術", title: "品牌策略如何影響高雄高中生對品牌的忠誠度", isFinalist: false, isConference: false, isPoster: true },
+
+            // 數理科學
+            { id: "S01", lang: "一般", group: "數理科學", title: "頭髮的保護罩--髮油", isFinalist: false, isConference: true, isPoster: true },
+            { id: "S02", lang: "一般", group: "數理科學", title: "烤箱烤製條件對番薯品質的研究", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S03", lang: "一般", group: "數理科學", title: "不同材料、材質對防水效果的影響", isFinalist: true, isConference: false, isPoster: false },
+            { id: "S04", lang: "一般", group: "數理科學", title: "探討環境變因與加工工藝對泡菜物理及化學特性之影響", isFinalist: false, isConference: true, isPoster: true },
+            { id: "S05", lang: "一般", group: "數理科學", title: "白胖饅頭的一生", isFinalist: false, isConference: true, isPoster: true },
+            { id: "S06", lang: "一般", group: "數理科學", title: "舌尖上的科學魔法", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S07", lang: "一般", group: "數理科學", title: "如果塑膠能回歸自然—白色污染的新解答", isFinalist: false, isConference: true, isPoster: true },
+            { id: "S08", lang: "一般", group: "數理科學", title: "做出最嫩的豆腐", isFinalist: false, isConference: true, isPoster: true },
+            { id: "S09", lang: "一般", group: "數理科學", title: "影響酒精發酵速率之多因素分析", isFinalist: false, isConference: true, isPoster: true },
+            { id: "S10", lang: "一般", group: "數理科學", title: "蚊一知十", isFinalist: true, isConference: false, isPoster: false },
+            { id: "S11", lang: "一般", group: "數理科學", title: "顏色逆轉勝：開發具備顏色校正功能之影像處理工具", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S12", lang: "一般", group: "數理科學", title: "不同曲線在莫比烏斯變換下的關係", isFinalist: false, isConference: true, isPoster: true },
+            { id: "S13", lang: "一般", group: "數理科學", title: "「有機一定比較營養？」——不同肥料對小白菜營養價值與土壤變化的實證研究", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S14", lang: "一般", group: "數理科學", title: "量子電腦和普通電腦的差異", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S15", lang: "一般", group: "數理科學", title: "RSA擴展位元能否對抗量子威脅", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S16", lang: "一般", group: "數理科學", title: "組合之美：探究路徑規劃 與 Scratch 程式實作", isFinalist: true, isConference: false, isPoster: false },
+            { id: "S17", lang: "一般", group: "數理科學", title: "傅立葉轉換的視覺化呈現", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S18", lang: "一般", group: "數理科學", title: "量子位元之幾何演化與運算邏輯研究 以布洛赫球面解析單位元量子閘之動態行為", isFinalist: false, isConference: false, isPoster: true },
+            { id: "S19", lang: "一般", group: "數理科學", title: "外送訂單路徑決策之數學建模與模擬分析—— 以曼哈頓距離、歐氏距離與 CP 值比較為例", isFinalist: true, isConference: false, isPoster: false },
+            { id: "SB01", lang: "雙語", group: "數理科學", title: "「環環相扣」－探討金屬環幾何參數對中央噴泉高度之影響", isFinalist: true, isConference: false, isPoster: false }
+        ];
+
+        // State variables
+        let currentTab = 'all';
+        let currentFilters = {
+            group: 'all',
+            lang: 'all',
+            search: ''
+        };
+
+        // DOM elements
+        const tableBody = document.getElementById('table-body');
+        const searchInput = document.getElementById('search-input');
+        
+        // Init function
+        window.addEventListener('DOMContentLoaded', () => {
+            calculateStats();
+            renderTable();
+        });
+
+        function calculateStats() {
+            // Count distinct types
+            const numFinalist = projects.filter(p => p.isFinalist).length;
+            const numConference = projects.filter(p => p.isConference).length;
+            const numPoster = projects.filter(p => p.isPoster).length;
+            
+            // Set stats values
+            document.getElementById('count-finalist').innerText = numFinalist;
+            document.getElementById('count-conference').innerText = numConference;
+            document.getElementById('count-poster').innerText = numPoster;
+
+            // Set badge counts on tabs
+            document.getElementById('badge-all').innerText = projects.length;
+            document.getElementById('badge-finalist').innerText = numFinalist;
+            document.getElementById('badge-conference').innerText = numConference;
+            document.getElementById('badge-poster').innerText = numPoster;
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            
+            // Update active styling on tabs
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                if (tab.getAttribute('onclick').includes(tabId)) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            renderTable();
+        }
+
+        function setFilter(type, value) {
+            currentFilters[type] = value;
+
+            // Update active styling on filter buttons
+            const btns = document.querySelectorAll(`.filter-btn[data-filter="${type}"]`);
+            btns.forEach(btn => {
+                if (btn.getAttribute('data-value') === value) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            renderTable();
+        }
+
+        function handleSearch() {
+            currentFilters.search = searchInput.value.trim().toLowerCase();
+            renderTable();
+        }
+
+        function clearFilters() {
+            // Reset filters
+            currentFilters = {
+                group: 'all',
+                lang: 'all',
+                search: ''
+            };
+            currentTab = 'all';
+
+            // Reset UI
+            searchInput.value = '';
+            
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach((btn, index) => {
+                if (index === 0) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                if (btn.getAttribute('data-value') === 'all') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            renderTable();
+        }
+
+        function getFilteredProjects() {
+            return projects.filter(project => {
+                // 1. Tab Check
+                if (currentTab === 'finalist' && !project.isFinalist) return false;
+                if (currentTab === 'conference' && !project.isConference) return false;
+                if (currentTab === 'poster' && !project.isPoster) return false;
+
+                // 2. Group Check
+                if (currentFilters.group !== 'all' && project.group !== currentFilters.group) return false;
+
+                // 3. Language Check
+                if (currentFilters.lang !== 'all' && project.lang !== currentFilters.lang) return false;
+
+                // 4. Search Query Check
+                if (currentFilters.search) {
+                    const searchLower = currentFilters.search;
+                    const matchesId = project.id.toLowerCase().includes(searchLower);
+                    const matchesTitle = project.title.toLowerCase().includes(searchLower);
+                    const matchesGroup = project.group.toLowerCase().includes(searchLower);
+                    if (!matchesId && !matchesTitle && !matchesGroup) return false;
+                }
+
+                return true;
+            });
+        }
+
+        function renderTable() {
+            const filtered = getFilteredProjects();
+            tableBody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="no-results">
+                            <i class="fas fa-search-minus"></i>
+                            沒有找到符合條件的專題作品，請試著更換關鍵字或篩選條件。
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Sorting: We want to sort projects by id. Let's write a simple sorter.
+            // Natural sort helper for bilingual (EB01) vs general (E01)
+            filtered.sort((a, b) => {
+                return a.id.localeCompare(b.id, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            filtered.forEach(project => {
+                const tr = document.createElement('tr');
+                
+                // Badges classes
+                const langBadgeClass = project.lang === '雙語' ? 'badge type-bilingual' : 'badge type-general';
+                
+                let groupBadgeClass = 'badge ';
+                if (project.group === '工程與設計') groupBadgeClass += 'group-eng';
+                else if (project.group === '人社藝術') groupBadgeClass += 'group-art';
+                else groupBadgeClass += 'group-sci';
+
+                // Status tag
+                let statusTagHtml = '';
+                if (project.isFinalist) {
+                    statusTagHtml = `<span class="badge status-final"><i class="fas fa-trophy"></i> 晉級決賽</span>`;
+                } else if (project.isConference) {
+                    statusTagHtml = `<span class="badge status-conf"><i class="fas fa-microphone"></i> 研討會發表</span>`;
+                } else if (project.isPoster) {
+                    statusTagHtml = `<span class="badge status-post"><i class="fas fa-image"></i> 海報展覽</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td><strong>${project.id}</strong></td>
+                    <td><span class="${langBadgeClass}">${project.lang}</span></td>
+                    <td><span class="${groupBadgeClass}">${project.group}</span></td>
+                    <td><span style="font-weight: 500;">${project.title}</span></td>
+                    <td>${statusTagHtml}</td>
+                `;
+
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Email copy function
+        function copyEmail() {
+            const email = document.getElementById('email-address').innerText;
+            navigator.clipboard.writeText(email).then(() => {
+                alert('信箱位址已複製至您的剪貼簿！\n' + email);
+            }).catch(err => {
+                // Fallback
+                console.error('Could not copy text: ', err);
+                alert('複製失敗，請手動複製信箱：' + email);
+            });
+        }
+
+        // Email sending function with visual feedback and copy fallback
+        function sendEmail() {
+            const email = 'arpowchaosun@smhs.kh.edu.tw';
+            const subject = encodeURIComponent('【專題成果展檔案修正】組別編號-作品名稱');
+            
+            // Try to open mailto link
+            window.location.href = `mailto:${email}?subject=${subject}`;
+            
+            // Provide immediate visual feedback on the button
+            const sendBtn = document.getElementById('send-email-btn');
+            const originalText = sendBtn.innerHTML;
+            
+            sendBtn.innerHTML = '<i class="fas fa-check"></i> 已嘗試開啟郵件';
+            sendBtn.style.background = '#10B981'; // emerald green
+            
+            setTimeout(() => {
+                sendBtn.innerHTML = originalText;
+                sendBtn.style.background = ''; // reset
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

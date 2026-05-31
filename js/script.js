@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { date: new Date('2026-05-20T08:00:00+08:00'), name: '公告初賽審查時間' },
         { date: new Date('2026-05-27T08:00:00+08:00'), name: '校內實體初賽' },
         { date: new Date('2026-06-01T12:00:00+08:00'), name: '公告入選決賽名單' },
-        { date: new Date('2026-06-03T13:00:00+08:00'), name: '決賽檔案繳交截止' },
+        { date: new Date('2026-06-05T20:00:00+08:00'), name: '決賽與研討會檔案繳交截止' },
         { date: new Date('2026-06-22T09:00:00+08:00'), name: '決賽場地預演' },
         { date: new Date('2026-06-29T09:00:00+08:00'), name: '海報決賽與成果展總決賽' },
         { date: new Date('2026-06-30T12:00:00+08:00'), name: '公布獲獎名單' }
@@ -227,6 +227,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectionDetails = document.getElementById('selection-details');
         if (selectionDetails) {
             selectionDetails.style.display = '';
+        }
+
+        // Results Announcement Period: Reveals after 6/01 12:00 PM
+        const resultsAnnounceTime = new Date('2026-06-01T12:00:00+08:00');
+        const resultsDetails = document.getElementById('results-details');
+        const isPreview = new URLSearchParams(window.location.search).has('preview');
+        
+        if (resultsDetails) {
+            if (now < resultsAnnounceTime && !isPreview) {
+                resultsDetails.style.display = 'none';
+            } else {
+                resultsDetails.style.display = 'block';
+            }
         }
     }
 
