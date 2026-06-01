@@ -1,4 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. Helper to parse ISO dates robustly in GMT+8 (Taipei Time) for older browsers
+    function parseGMT8Date(dateStr) {
+        const parsed = new Date(dateStr);
+        if (!isNaN(parsed.getTime())) {
+            return parsed;
+        }
+        
+        // Manual fallback for older Safari / Android WebViews
+        const regex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:[+-](\d{2}):(\d{2}))?$/;
+        const parts = dateStr.match(regex);
+        if (parts) {
+            const year = parseInt(parts[1], 10);
+            const month = parseInt(parts[2], 10) - 1; // 0-based
+            const day = parseInt(parts[3], 10);
+            const hour = parseInt(parts[4], 10);
+            const minute = parseInt(parts[5], 10);
+            const second = parseInt(parts[6], 10);
+            
+            const utcTime = Date.UTC(year, month, day, hour, minute, second);
+            const offsetMs = 8 * 60 * 60 * 1000; // Taipei time is UTC+8
+            return new Date(utcTime - offsetMs);
+        }
+        return parsed;
+    }
+
     // 1. Navigation background change on scroll
     const navbar = document.getElementById('navbar');
     
@@ -43,28 +68,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. Scroll Reveal Animation using Intersection Observer
+    // 3. Scroll Reveal Animation using Intersection Observer (with fallback)
     const fadeElements = document.querySelectorAll('.fade-in');
 
-    const appearOptions = {
-        threshold: 0.15,
-        rootMargin: "0px 0px -50px 0px"
-    };
-
-    const appearOnScroll = new IntersectionObserver(function(entries, observer) {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) {
-                return;
-            } else {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
+    if (!('IntersectionObserver' in window)) {
+        // Fallback: make elements visible immediately if IntersectionObserver is not supported
+        fadeElements.forEach(element => {
+            element.classList.add('visible');
         });
-    }, appearOptions);
+    } else {
+        const appearOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
 
-    fadeElements.forEach(element => {
-        appearOnScroll.observe(element);
-    });
+        const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                } else {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, appearOptions);
+
+        fadeElements.forEach(element => {
+            appearOnScroll.observe(element);
+        });
+    }
 
     // 4. Smooth Scrolling for Anchor Links (fallback/enhancement)
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -90,15 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. Dynamic Countdown & Timeline Logic
     const timelineData = [
-        { date: new Date('2026-04-27T00:00:00+08:00'), name: '開放報名與檔案上傳' },
-        { date: new Date('2026-05-15T23:59:59+08:00'), name: '報名截止收件' },
-        { date: new Date('2026-05-20T08:00:00+08:00'), name: '公告初賽審查時間' },
-        { date: new Date('2026-05-27T08:00:00+08:00'), name: '校內實體初賽' },
-        { date: new Date('2026-06-01T12:00:00+08:00'), name: '公告入選決賽名單' },
-        { date: new Date('2026-06-05T20:00:00+08:00'), name: '決賽與研討會檔案繳交截止' },
-        { date: new Date('2026-06-22T09:00:00+08:00'), name: '決賽場地預演' },
-        { date: new Date('2026-06-29T09:00:00+08:00'), name: '海報決賽與成果展總決賽' },
-        { date: new Date('2026-06-30T12:00:00+08:00'), name: '公布獲獎名單' }
+        { date: parseGMT8Date('2026-04-27T00:00:00+08:00'), name: '開放報名與檔案上傳' },
+        { date: parseGMT8Date('2026-05-15T23:59:59+08:00'), name: '報名截止收件' },
+        { date: parseGMT8Date('2026-05-20T08:00:00+08:00'), name: '公告初賽審查時間' },
+        { date: parseGMT8Date('2026-05-27T08:00:00+08:00'), name: '校內實體初賽' },
+        { date: parseGMT8Date('2026-06-01T12:00:00+08:00'), name: '公告入選決賽名單' },
+        { date: parseGMT8Date('2026-06-05T20:00:00+08:00'), name: '決賽與研討會檔案繳交截止' },
+        { date: parseGMT8Date('2026-06-22T09:00:00+08:00'), name: '決賽場地預演' },
+        { date: parseGMT8Date('2026-06-29T09:00:00+08:00'), name: '海報決賽與成果展總決賽' },
+        { date: parseGMT8Date('2026-06-30T12:00:00+08:00'), name: '公布獲獎名單' }
     ];
 
     const currentPhaseEl = document.getElementById('current-phase');
@@ -171,8 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         
         // Registration Period
-        const regStart = new Date('2026-04-27T00:00:00+08:00');
-        const regEnd = new Date('2026-05-15T23:59:59+08:00');
+        const regStart = parseGMT8Date('2026-04-27T00:00:00+08:00');
+        const regEnd = parseGMT8Date('2026-05-15T23:59:59+08:00');
         
         const registerBtnHero = document.getElementById('register-btn-hero');
         const registerLinkSchedule = document.getElementById('register-link-schedule');
@@ -194,8 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Correction Period: 5/16 23:00 - 5/18 23:59
-        const corrStart = new Date('2026-05-16T23:00:00+08:00');
-        const corrEnd = new Date('2026-05-18T23:59:59+08:00');
+        const corrStart = parseGMT8Date('2026-05-16T23:00:00+08:00');
+        const corrEnd = parseGMT8Date('2026-05-18T23:59:59+08:00');
         
         const correctionSection = document.getElementById('correction-announcement');
         const isCorrectionPeriod = now >= corrStart && now <= corrEnd;
@@ -230,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Results Announcement Period: Reveals after 6/01 12:00 PM
-        const resultsAnnounceTime = new Date('2026-06-01T12:00:00+08:00');
+        const resultsAnnounceTime = parseGMT8Date('2026-06-01T12:00:00+08:00');
         const resultsDetails = document.getElementById('results-details');
         const isPreview = new URLSearchParams(window.location.search).has('preview');
         

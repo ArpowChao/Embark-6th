@@ -20,12 +20,16 @@
     --shadow-lg: 0 15px 35px rgba(29, 53, 87, 0.1);
 }
 
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 body {
     font-family: 'Noto Sans TC', sans-serif;
     color: var(--text-main);
     background-color: var(--bg-color);
     line-height: 1.6;
-    overflow-x: hidden;
     scroll-behavior: smooth;
 }
 
@@ -1701,4 +1705,78 @@ footer {
 /* Cursor style for zoomable elements */
 .status-table-img, .group-list-img, .gallery-item img, .about-image img {
     cursor: zoom-in;
+}
+
+/* Mobile Layout Responsiveness & Overflow Fixes */
+@media (max-width: 1200px) {
+    .members-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Prevent body stretching */
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    /* Container padding adjustment */
+    .container {
+        padding: 0 1.2rem;
+    }
+
+    /* Members Grid styling */
+    .members-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Timeline spacing adjustments to save space on mobile */
+    .timeline::before {
+        left: 15px;
+    }
+    .timeline-item {
+        padding-left: 45px;
+        margin-bottom: 2rem;
+    }
+    .timeline-dot {
+        left: 5px;
+        width: 24px;
+        height: 24px;
+        border-width: 4px;
+    }
+    .timeline-details .details-content {
+        padding: 1rem 0.8rem;
+    }
+
+    /* Table horizontal scrolling fixes */
+    .review-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+    }
+    .review-table th, .review-table td {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .members-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .timeline-item {
+        padding-left: 35px;
+    }
+    .timeline::before {
+        left: 10px;
+    }
+    .timeline-dot {
+        left: 0;
+    }
+    .review-table th, .review-table td {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
 }
