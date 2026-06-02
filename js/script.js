@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else {
         const appearOptions = {
-            threshold: 0.15,
+            threshold: 0.02, // Lowered from 0.15 to ensure tall sections reveal correctly on mobile
             rootMargin: "0px 0px -50px 0px"
         };
 
@@ -320,4 +320,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // 8. Fix iOS/Android Details click behavior and card-level clicking
+    document.querySelectorAll('.timeline-content').forEach(content => {
+        const details = content.querySelector('.timeline-details');
+        if (!details) return;
+
+        // Make the entire timeline card clickable (except links, buttons and already expanded details content)
+        content.addEventListener('click', (e) => {
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('.details-content')) {
+                return;
+            }
+            
+            e.preventDefault();
+            if (details.hasAttribute('open')) {
+                details.removeAttribute('open');
+            } else {
+                details.setAttribute('open', '');
+            }
+        });
+    });
 });
