@@ -264,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Results Announcement Period: Reveals after 6/01 12:00 PM
         const resultsAnnounceTime = parseGMT8Date('2026-06-01T12:00:00+08:00');
         const resultsDetails = document.getElementById('results-details');
+        const finalsDetails = document.getElementById('finals-details');
         const isPreview = new URLSearchParams(window.location.search).has('preview');
         
         if (resultsDetails) {
@@ -271,6 +272,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultsDetails.style.display = 'none';
             } else {
                 resultsDetails.style.display = 'block';
+            }
+        }
+
+        if (finalsDetails) {
+            if (now < resultsAnnounceTime && !isPreview) {
+                finalsDetails.style.display = 'none';
+            } else {
+                finalsDetails.style.display = 'block';
             }
         }
     }
