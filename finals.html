@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>決賽日時程表 | Embark 啟程</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header {
+            padding: 8rem 0 4rem 0;
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.12), rgba(59, 130, 246, 0.06));
+            text-align: center;
+        }
+        .page-title {
+            font-size: 3rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+        .content-container {
+            max-width: 1100px;
+            margin: -2rem auto 4rem auto;
+            background: #fff;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 10;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+        .back-link:hover { transform: translateX(-5px); }
+
+        /* Venue Tabs */
+        .venue-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .venue-tab {
+            padding: 0.9rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-light);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .venue-tab:hover { color: var(--text-main); }
+        .venue-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .venue-tab .tab-icon { margin-right: 6px; }
+
+        .venue-panel { display: none; }
+        .venue-panel.active { display: block; }
+
+        /* Venue Header */
+        .venue-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.5rem;
+        }
+        .venue-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .badge-finals { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .badge-seminar { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+        .venue-title { font-size: 1.6rem; color: var(--text-main); }
+        .venue-desc {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Schedule List */
+        .schedule-list { list-style: none; padding: 0; }
+        .schedule-item {
+            display: flex;
+            gap: 1.2rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: flex-start;
+        }
+        .schedule-item:last-child { border-bottom: none; }
+
+        .schedule-time {
+            min-width: 110px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            padding-top: 2px;
+            white-space: nowrap;
+        }
+        .schedule-body { flex: 1; }
+        .schedule-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+        .schedule-meta {
+            font-size: 0.82rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* Tag types */
+        .schedule-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .tag-ceremony { background: #fef3c7; color: #92400e; }
+        .tag-present  { background: #dbeafe; color: #1e40af; }
+        .tag-break    { background: #f3f4f6; color: #6b7280; }
+        .tag-discuss  { background: #ede9fe; color: #5b21b6; }
+        .tag-award    { background: #fce7f3; color: #9d174d; }
+        .tag-live     { background: #dcfce7; color: #166534; }
+
+        /* Break row style */
+        .schedule-item.is-break {
+            background: #fafafa;
+            border-radius: 8px;
+            margin: 0.3rem 0;
+            padding: 0.8rem 1rem;
+        }
+        .schedule-item.is-break .schedule-title {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Group number */
+        .group-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+            padding: 1rem 1.2rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Info box */
+        .info-box {
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.06), rgba(59, 130, 246, 0.04));
+            border-left: 4px solid var(--primary-color);
+            padding: 1.2rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 2rem;
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+        .info-box strong { color: var(--text-main); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-container {
+                padding: 1.5rem;
+                margin-top: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .page-title { font-size: 2rem; }
+            .venue-tab { padding: 0.7rem 1rem; font-size: 0.85rem; }
+            .schedule-item { flex-direction: column; gap: 0.3rem; }
+            .schedule-time { min-width: auto; }
+            .venue-title { font-size: 1.3rem; }
+            .judges-section { margin-top: 2.5rem; padding-top: 2rem; }
+            .judges-grid { gap: 1.2rem; }
+            .judge-card { padding: 1.5rem 1.2rem; }
+        }
+
+        /* Judges Section Styling */
+        .judges-section {
+            margin-top: 4rem;
+            border-top: 2px solid #e5e7eb;
+            padding-top: 3rem;
+        }
+        .judges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .judge-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .judge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            opacity: 0.8;
+        }
+        .judge-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(255, 140, 66, 0.3);
+        }
+        .judge-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(59, 130, 246, 0.1));
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin-bottom: 1.2rem;
+            transition: var(--transition);
+            border: 2px solid rgba(59, 130, 246, 0.15);
+        }
+        .judge-card:hover .judge-avatar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            transform: scale(1.05);
+            border-color: transparent;
+        }
+        .judge-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.3rem;
+        }
+        .judge-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .judge-dept {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+            line-height: 1.4;
+            min-height: 2.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .judge-contacts {
+            width: 100%;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        .judge-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+            line-height: 1.4;
+            width: 100%;
+            word-break: break-all;
+        }
+        .judge-contact-item i {
+            color: var(--secondary-color);
+            width: 16px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .judge-contact-item a {
+            transition: var(--transition);
+        }
+        .judge-contact-item a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Embark <span>啟程</span></a>
+            <a href="index.html" class="btn primary-btn" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">返回首頁</a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">決賽日時程表</h1>
+            <p class="page-subtitle">115 年 06/29 (一) ｜ 高雄市立三民高級中學</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content-container">
+
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> 回望來時路</a>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle" style="color: var(--primary-color); margin-right: 4px;"></i>
+                每組簡報時間為 <strong style="color: #EF4444;">8 分鐘</strong>（<strong>6:30</strong> 短鈴 1 聲提醒，<strong>8:00</strong> 長鈴請立即停止），決賽場另有評審教授問答 <strong>5 分鐘</strong>。
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><span class="schedule-tag tag-ceremony">典禮</span> 開閉幕</div>
+                <div class="legend-item"><span class="schedule-tag tag-present">報告</span> 簡報發表</div>
+                <div class="legend-item"><span class="schedule-tag tag-discuss">討論</span> 與談/問答</div>
+                <div class="legend-item"><span class="schedule-tag tag-break">休息</span> 休息/換場</div>
+                <div class="legend-item"><span class="schedule-tag tag-award">頒獎</span> 頒獎典禮</div>
+                <div class="legend-item"><span class="schedule-tag tag-live">直播</span> 觀看直播</div>
+            </div>
+
+            <!-- Venue Tabs -->
+            <div class="venue-tabs">
+                <button class="venue-tab active" onclick="switchVenue('ab4f', this)">
+                    <span class="tab-icon"><i class="fas fa-trophy"></i></span>4F 音樂廳
+                </button>
+                <button class="venue-tab" onclick="switchVenue('ab6f', this)">
+                    <span class="tab-icon"><i class="fas fa-trophy"></i></span>6F 活動中心
+                </button>
+                <button class="venue-tab" onclick="switchVenue('ce', this)">
+                    <span class="tab-icon"><i class="fas fa-comments"></i></span>CE 研討會場
+                </button>
+                <button class="venue-tab" onclick="switchVenue('df', this)">
+                    <span class="tab-icon"><i class="fas fa-comments"></i></span>DF 研討會場
+                </button>
+            </div>
+
+            <!-- ==================== 4F 音樂廳 ==================== -->
+            <div id="panel-ab4f" class="venue-panel active">
+                <div class="venue-header">
+                    <h3 class="venue-title">4F 音樂廳</h3>
+                    <span class="venue-badge badge-finals"><i class="fas fa-trophy"></i> 決賽場</span>
+                </div>
+                <p class="venue-desc">成果展決賽 AB 場（大學教授評審問答）</p>
+
+                <ul class="schedule-list">
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:30 - 12:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-ceremony">典禮</span> 開幕式</div>
+                            <div class="schedule-meta">主持人開場、校長致詞、來賓介紹、開場影片</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:50 - 13:03</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">1</span>從發電到儲電：智慧太陽能新策略</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:04 - 13:17</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">2</span>美國關稅政策影響台灣半導體與中國高科技產業的雙軌發展</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:18 - 13:31</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">3</span>外送訂單路徑決策之數學建模與模擬分析——以曼哈頓距離、歐氏距離與 CP 值比較為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:32 - 13:45</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">4</span>碳為觀止——探討生物炭混凝土之吸碳能力</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:46 - 13:59</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">5</span>投？不投？我國公投議題與公民投票意願之探討——以高雄市三民高中學生為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">14:00 - 14:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 中場休息</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:11 - 14:24</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">6</span>異質柏油材料對影響熱島效應之探討</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:25 - 14:38</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">7</span>不同材料、材質對防水效果的影響</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:39 - 14:52</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">8</span>水解「澱」學——混紡衣物水解之研究</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:53 - 15:06</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">9</span>圖像與情緒投射——青少年在自由繪畫中的情緒線索</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">15:07 - 15:20</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 休息，移動至 6F 活動中心</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:20 - 15:35</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-discuss">討論</span> 教授評審討論</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:35 - 15:45</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-ceremony">典禮</span> 回顧引導與教授致詞</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:45 - 16:05</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-award">頒獎</span> 頒獎典禮</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">16:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 放學賦歸</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ==================== 6F 活動中心 ==================== -->
+            <div id="panel-ab6f" class="venue-panel">
+                <div class="venue-header">
+                    <h3 class="venue-title">6F 活動中心</h3>
+                    <span class="venue-badge badge-finals"><i class="fas fa-trophy"></i> 決賽場</span>
+                </div>
+                <p class="venue-desc">成果展決賽 AB 場（大學教授評審問答）</p>
+
+                <ul class="schedule-list">
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:30 - 12:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-ceremony">典禮</span> 開幕式</div>
+                            <div class="schedule-meta">主持人開場、教務主任致詞、來賓介紹、開場影片</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:50 - 13:03</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">1</span>人類對 AI 生成作品之判別能力</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:04 - 13:17</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">2</span>組合之美：探究路徑規劃與 Scratch 程式實作</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:18 - 13:31</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">3</span>「風」度翩翩——太陽能溫度自動調控風扇</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:32 - 13:45</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">4</span>投資知識知多少？高中生金融投資認知與課程需求之研究——以高雄市三民高中為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:46 - 13:59</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">5</span>蚊一知十</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">14:00 - 14:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 中場休息</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:11 - 14:24</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">6</span>電腦用穿戴式手部輸入裝置</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:25 - 14:38</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">7</span>美國 H-2A 制度對農業勞力供應之影響：以加州草莓產業為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:39 - 14:52</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">8</span>「環環相扣」——探討金屬環幾何參數對中央噴泉高度之影響</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:53 - 15:06</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">9</span>水安通：零時差水位即時警告系統</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:07 - 15:20</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">10</span>誰的二二八？不同世代對二二八事件的記憶與理解</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">15:20 - 15:35</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 教授評審討論</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:35 - 15:45</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-ceremony">典禮</span> 回顧引導與教授致詞</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:45 - 16:05</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-award">頒獎</span> 頒獎典禮</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">16:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 放學賦歸</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ==================== CE 研討會場 ==================== -->
+            <div id="panel-ce" class="venue-panel">
+                <div class="venue-header">
+                    <h3 class="venue-title">CE 研討會場</h3>
+                    <span class="venue-badge badge-seminar"><i class="fas fa-comments"></i> 研討會</span>
+                </div>
+                <p class="venue-desc">專題研討會分享場次，由與談人引導討論</p>
+
+                <ul class="schedule-list">
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:30 - 12:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-live">直播</span> 觀看 4F 開幕式直播</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:50 - 13:00</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-ceremony">典禮</span> 與談人開場</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:00 - 13:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">1</span>AI 聽診器：探討回收物的材質碰撞聲紋辨識</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:10 - 13:20</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">2</span>智慧校園點名系統</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:20 - 13:30</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">3</span>校園標誌與行人安全即時偵測系統</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:30 - 13:40</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">4</span>台灣城鄉資訊能力落差之原因探討</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:40 - 13:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">5</span>探討生成式 AI 對青少年學習的影響——以三民高中為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:50 - 14:00</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">6</span>不同曲線在莫比烏斯雙變換下的關係</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">14:00 - 14:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 中場休息與換場</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:10 - 14:20</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">7</span>做出最嫩的豆腐</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:20 - 14:30</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">8</span>白胖饅頭的一生</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:30 - 14:40</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">9</span>頭髮的保護罩——髮油</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:40 - 14:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">10</span>探討環境變因與加工工藝對泡菜物理及化學特性之影響</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:50 - 15:00</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">11</span>影響酒精發酵速率之多因素分析</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">15:00 - 15:35</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 中場休息</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:35 - 16:05</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-live">直播</span> 觀看 4F 頒獎典禮直播</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ==================== DF 研討會場 ==================== -->
+            <div id="panel-df" class="venue-panel">
+                <div class="venue-header">
+                    <h3 class="venue-title">DF 研討會場</h3>
+                    <span class="venue-badge badge-seminar"><i class="fas fa-comments"></i> 研討會</span>
+                </div>
+                <p class="venue-desc">專題研討會分享場次，由與談人引導討論</p>
+
+                <ul class="schedule-list">
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:30 - 12:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-live">直播</span> 觀看 4F 開幕式直播</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">12:50 - 13:00</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-ceremony">典禮</span> 與談人開場</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:00 - 13:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">1</span>在零工經濟崛起下台灣的外送員和 Uber 司機的勞權問題——以美國 Prop22 公投案為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:10 - 13:20</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">2</span>博物館收藏：如何在「保存、展示與歷史正義」之間取得平衡——以大英博物館帕德嫩神廟爭議為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:20 - 13:30</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">3</span>探討鐵路地下化對三塊厝地區之經濟效益與空間轉型的影響</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:30 - 13:40</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">4</span>從音樂活動到城市經濟：以高雄世運演唱會為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:40 - 13:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">5</span>同一所學校內不同運動空間的使用差異</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:50 - 14:00</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">6</span>探討青少年消費糾紛——以高中生為例</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">14:00 - 14:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 中場休息與換場</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:10 - 14:20</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">7</span>變壓為寶——抓住指間流走的熱</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:20 - 14:30</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">8</span>氣候變遷下高屏溪洪水風險之 GIS 模擬</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:30 - 14:40</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">9</span>如果塑膠能回歸自然——白色污染的新解答</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:40 - 14:50</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">10</span>智慧電網——綠能即時調度系統</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">14:50 - 15:00</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">11</span>隱形電池</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:00 - 15:10</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-present">報告</span><span class="group-num">12</span>看不見的危機——從都市地理環境探討空氣品質</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item is-break">
+                        <span class="schedule-time">15:10 - 15:35</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-break">休息</span> 中場休息</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:35 - 16:05</span>
+                        <div class="schedule-body">
+                            <div class="schedule-title"><span class="schedule-tag tag-live">直播</span> 觀看 4F 頒獎典禮直播</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ==================== 決賽評審陣容 ==================== -->
+            <div class="judges-section">
+                <div class="section-header center" style="margin-bottom: 2rem;">
+                    <h2>決賽評審陣容 <span>Distinguished Judges</span></h2>
+                    <div class="header-line center-line"></div>
+                </div>
+                <div class="judges-grid">
+                    
+                    <!-- 評審 1: 賴穎暉 -->
+                    <div class="judge-card">
+                        <div class="judge-avatar">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <h4 class="judge-name">賴穎暉 博士</h4>
+                        <div class="judge-title">系主任 / 教授</div>
+                        <div class="judge-dept">國立陽明交通大學<br>生物醫學工程學系</div>
+                    </div>
+
+                    <!-- 評審 2: 楊奇達 -->
+                    <div class="judge-card">
+                        <div class="judge-avatar">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <h4 class="judge-name">楊奇達 教授</h4>
+                        <div class="judge-title">專任教授</div>
+                        <div class="judge-dept">國立高雄科技大學<br>半導體工程系</div>
+                    </div>
+
+                    <!-- 評審 3: 李文熙 -->
+                    <div class="judge-card">
+                        <div class="judge-avatar">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h4 class="judge-name">李文熙 博士</h4>
+                        <div class="judge-title">校長 / 特聘教授</div>
+                        <div class="judge-dept">國立澎湖科技大學<br>電機工程系</div>
+                    </div>
+
+                    <!-- 評審 4: 吳俊毅 -->
+                    <div class="judge-card">
+                        <div class="judge-avatar">
+                            <i class="fas fa-scale-balanced"></i>
+                        </div>
+                        <h4 class="judge-name">吳俊毅 博士</h4>
+                        <div class="judge-title">院長 / 法律系教授</div>
+                        <div class="judge-dept">國立高雄大學 法學院<br>法律學系</div>
+                    </div>
+
+                    <!-- 評審 5: 劉奇峯 -->
+                    <div class="judge-card">
+                        <div class="judge-avatar">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h4 class="judge-name">劉奇峯 博士</h4>
+                        <div class="judge-title">助理教授 / 政治學博士</div>
+                        <div class="judge-dept">國立中山大學<br>亞太英語碩士學位學程所</div>
+                    </div>
+
+                    <!-- 評審 6: 王映樵 -->
+                    <div class="judge-card">
+                        <div class="judge-avatar">
+                            <i class="fas fa-atom"></i>
+                        </div>
+                        <h4 class="judge-name">王映樵 博士</h4>
+                        <div class="judge-title">助理教授</div>
+                        <div class="judge-dept">國立中山大學<br>材料與光電科學學系</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="text-align: center; padding: 2rem; color: var(--text-light); font-size: 0.85rem;">
+        <p>高雄市立三民高級中學 第六屆專題成果展 &copy; 2025 Embark 啟程</p>
+    </footer>
+
+    <script>
+    function switchVenue(id, el) {
+        document.querySelectorAll('.venue-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.venue-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + id).classList.add('active');
+        if (el) el.classList.add('active');
+    }
+    </script>
+
+</body>
+</html>
