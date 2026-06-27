@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動賓果遊戲 | Embark 啟程</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header {
+            padding: 8rem 0 3rem 0;
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.12), rgba(59, 130, 246, 0.06));
+            text-align: center;
+        }
+        .page-title {
+            font-size: 3rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        /* Board Selector Tabs */
+        .board-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .board-tab {
+            padding: 0.8rem 2rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-light);
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .board-tab:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .board-tab.active {
+            color: #fff;
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }
+
+        .board-tab.tab-blue.active {
+            border-color: var(--secondary-color);
+            background: var(--secondary-color);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Layout — board-centric for touchscreen */
+        .bingo-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 100vw;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Board Styling — fill available viewport width */
+        .board-container {
+            background: transparent;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            box-shadow: none;
+            position: relative;
+            width: 100%;
+            max-width: min(95vw, calc(95vh * 16 / 9));
+        }
+        
+        .board-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-size: 100% 100%;
+            background-position: center;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(29, 53, 87, 0.15);
+            overflow: hidden;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        .board-wrapper.theme-orange {
+            background-image: url('3.png');
+        }
+
+        .board-wrapper.theme-blue {
+            background-image: url('4.png');
+        }
+
+        /* Interactive Hotspots */
+        .bingo-cell {
+            position: absolute;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 10px;
+            box-sizing: border-box;
+            z-index: 5;
+        }
+
+        /* Glow ring on hover based on active theme */
+        .theme-orange .bingo-cell:not(.corner-card):hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.5);
+            border: 2px solid rgba(255, 140, 66, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .theme-blue .bingo-cell:not(.corner-card):hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Text cell base border styling */
+        .text-cell {
+            border: 2.5px solid transparent;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        /* Clicked/Selected state (not yet completed in any line) */
+        .theme-orange .text-cell.completed {
+            border: 3px solid #FF8C42;
+            box-shadow: 0 0 12px rgba(255, 140, 66, 0.4);
+        }
+        
+        .theme-blue .text-cell.completed {
+            border: 3px solid #3B82F6;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Completed Row Border (Horizontal dashed) */
+        .theme-orange .text-cell.completed.in-completed-row {
+            border-top: 4px dashed #FF8C42;
+            border-bottom: 4px dashed #FF8C42;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            box-shadow: 0 0 18px rgba(255, 140, 66, 0.45);
+            background: rgba(255, 140, 66, 0.06);
+        }
+
+        .theme-blue .text-cell.completed.in-completed-row {
+            border-top: 4px dashed #3B82F6;
+            border-bottom: 4px dashed #3B82F6;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.45);
+            background: rgba(59, 130, 246, 0.06);
+        }
+
+        /* Completed Col Border (Vertical dashed) */
+        .theme-orange .text-cell.completed.in-completed-col {
+            border-left: 4px dashed #FF8C42;
+            border-right: 4px dashed #FF8C42;
+            border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+            box-shadow: 0 0 18px rgba(255, 140, 66, 0.45);
+            background: rgba(255, 140, 66, 0.06);
+        }
+
+        .theme-blue .text-cell.completed.in-completed-col {
+            border-left: 4px dashed #3B82F6;
+            border-right: 4px dashed #3B82F6;
+            border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.45);
+            background: rgba(59, 130, 246, 0.06);
+        }
+
+        /* Intersection (Both Row and Col Completed) - full dashed border + stronger fill */
+        .theme-orange .text-cell.completed.in-completed-row.in-completed-col {
+            border: 4px dashed #FF8C42;
+            box-shadow: 0 0 25px rgba(255, 140, 66, 0.6);
+            background: rgba(255, 140, 66, 0.12);
+        }
+
+        .theme-blue .text-cell.completed.in-completed-row.in-completed-col {
+            border: 4px dashed #3B82F6;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+            background: rgba(59, 130, 246, 0.12);
+        }
+
+        /* Checkmark icon - ONLY shown when BOTH row and col are completed! */
+        .text-cell .cell-check {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            opacity: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 7;
+            pointer-events: none;
+        }
+
+        .theme-orange .text-cell .cell-check {
+            background: #FF8C42;
+            box-shadow: 0 4px 10px rgba(255, 140, 66, 0.4);
+        }
+
+        .theme-blue .text-cell .cell-check {
+            background: #3B82F6;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Visible ONLY when in-completed-row AND in-completed-col intersect! */
+        .text-cell.completed.in-completed-row.in-completed-col .cell-check {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Gift Cells Base Styling */
+        .gift-cell {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            overflow: hidden; /* to clip the shimmer sweep */
+        }
+
+        /* Unclaimed gift boxes breathing glow and subtle bobbing/scaling to entice players! */
+        .theme-orange .gift-cell:not(.completed) {
+            border: 2px solid rgba(255, 140, 66, 0.35);
+            box-shadow: 0 0 15px rgba(255, 140, 66, 0.2), inset 0 0 8px rgba(255, 140, 66, 0.05);
+            animation: giftEnticeOrange 3s infinite ease-in-out;
+        }
+
+        .theme-blue .gift-cell:not(.completed) {
+            border: 2px solid rgba(59, 130, 246, 0.35);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), inset 0 0 8px rgba(59, 130, 246, 0.05);
+            animation: giftEnticeBlue 3s infinite ease-in-out;
+        }
+
+        /* Hover states for unclaimed gift cells */
+        .theme-orange .gift-cell:not(.completed):hover {
+            transform: scale(1.06) !important;
+            box-shadow: 0 0 30px rgba(255, 140, 66, 0.8), inset 0 0 15px rgba(255, 140, 66, 0.3) !important;
+            border-color: #FF8C42 !important;
+            z-index: 10;
+        }
+
+        .theme-blue .gift-cell:not(.completed):hover {
+            transform: scale(1.06) !important;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8), inset 0 0 15px rgba(59, 130, 246, 0.3) !important;
+            border-color: #3B82F6 !important;
+            z-index: 10;
+        }
+
+        /* Shimmer sweep effect on unclaimed gift cells (Holographic shiny bar effect) */
+        .gift-cell:not(.completed)::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.35) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg);
+            animation: giftShimmer 3.5s infinite linear;
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        @keyframes giftShimmer {
+            0% { left: -150%; }
+            35% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        @keyframes giftEnticeOrange {
+            0% {
+                box-shadow: 0 0 10px rgba(255, 140, 66, 0.15), inset 0 0 5px rgba(255, 140, 66, 0.03);
+                border-color: rgba(255, 140, 66, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(255, 140, 66, 0.65), inset 0 0 15px rgba(255, 140, 66, 0.25);
+                border-color: rgba(255, 140, 66, 0.95);
+                transform: scale(1.03);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(255, 140, 66, 0.15), inset 0 0 5px rgba(255, 140, 66, 0.03);
+                border-color: rgba(255, 140, 66, 0.3);
+                transform: scale(1);
+            }
+        }
+
+        @keyframes giftEnticeBlue {
+            0% {
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.15), inset 0 0 5px rgba(59, 130, 246, 0.03);
+                border-color: rgba(59, 130, 246, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(59, 130, 246, 0.65), inset 0 0 15px rgba(59, 130, 246, 0.25);
+                border-color: rgba(59, 130, 246, 0.95);
+                transform: scale(1.03);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.15), inset 0 0 5px rgba(59, 130, 246, 0.03);
+                border-color: rgba(59, 130, 246, 0.3);
+                transform: scale(1);
+            }
+        }
+
+        /* Gift Claimed (completed row/column) -> Heavy desaturated + dark overlay */
+        .gift-cell.completed {
+            backdrop-filter: grayscale(100%) brightness(0.5) contrast(0.7);
+            -webkit-backdrop-filter: grayscale(100%) brightness(0.5) contrast(0.7);
+            background: rgba(0, 0, 0, 0.45);
+            border: 3px solid #475569;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            animation: none !important;
+            cursor: default;
+        }
+
+        /* "已領取" stamp on claimed gifts */
+        .gift-cell.completed::after {
+            content: '已領取';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.85);
+            background: rgba(239, 68, 68, 0.8);
+            padding: 0.2rem 0.8rem;
+            border-radius: 6px;
+            letter-spacing: 3px;
+            z-index: 8;
+            pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+
+        .gift-cell .gift-icon-overlay {
+            color: #cbd5e1; /* light gray icon */
+            font-size: 1.5rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 7;
+            pointer-events: none;
+        }
+
+        .gift-cell.completed .gift-icon-overlay {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        @keyframes pulseGlowOrange {
+            from { box-shadow: 0 0 8px rgba(255, 140, 66, 0.3); border-color: rgba(255, 140, 66, 0.5); }
+            to { box-shadow: 0 0 20px rgba(255, 140, 66, 0.6); border-color: rgba(255, 140, 66, 1); }
+        }
+
+        @keyframes pulseGlowBlue {
+            from { box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); border-color: rgba(59, 130, 246, 0.5); }
+            to { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); border-color: rgba(59, 130, 246, 1); }
+        }
+
+        /* 3D Flip Card for Corner Cell */
+        .corner-card {
+            perspective: 1000px;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: 10px;
+        }
+
+        .theme-orange .corner-card:hover .card-inner:not(.flipped) {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.5);
+        }
+
+        .theme-blue .corner-card:hover .card-inner:not(.flipped) {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .corner-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card-front {
+            background: transparent;
+            cursor: pointer;
+        }
+
+        /* Card back shows cropped logo card from 4.png */
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .theme-orange .card-back {
+            border: 2px solid #FF8C42;
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.5);
+        }
+
+        .theme-blue .card-back {
+            border: 2px solid #3B82F6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .card-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* SVG Line overlays */
+        .bingo-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .bingo-line {
+            stroke: url(#glow-grad);
+            stroke-width: 12;
+            stroke-linecap: round;
+            filter: url(#glow-filter);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+        }
+
+        .bingo-line.active {
+            opacity: 1;
+            animation: drawLine 0.8s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Info Panel */
+        .info-panel {
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(59, 130, 246, 0.05);
+        }
+
+        .info-title {
+            font-size: 1.6rem;
+            color: var(--text-main);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-title i {
+            color: var(--primary-color);
+        }
+
+        .rules-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+
+        .rules-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .rules-list li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        /* Stats Card */
+        .stats-box {
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.05), rgba(59, 130, 246, 0.04));
+            border-left: 5px solid var(--primary-color);
+            padding: 1.5rem;
+            border-radius: 0 16px 16px 0;
+            margin-bottom: 2rem;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+        .theme-blue-ui .stats-box {
+            border-left-color: var(--secondary-color);
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        /* Connections Tracker */
+        .tracker-section {
+            margin-bottom: 2rem;
+        }
+
+        .tracker-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.8rem;
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+        }
+
+        .tracker-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .tracker-item.active {
+            background: rgba(220, 252, 231, 0.6);
+            border-color: #86efac;
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .tracker-item i {
+            font-size: 0.9rem;
+        }
+
+        .tracker-item.active i {
+            color: #15803d;
+        }
+
+        /* Buttons */
+        .btn-reset {
+            width: 100%;
+            background: #fff;
+            color: #ef4444;
+            border: 2px solid #fecaca;
+            padding: 0.9rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-reset:hover {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            transform: translateY(-2px);
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Floating bottom control bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 0.6rem 2rem;
+            flex-wrap: wrap;
+        }
+
+        .bottom-bar .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #FF8C42, #FFD700);
+            color: #fff;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 10px rgba(255, 140, 66, 0.3);
+        }
+
+        .bottom-bar .stat-chip i {
+            font-size: 1rem;
+        }
+
+        .bottom-bar .tracker-pills {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .bottom-bar .tracker-pill {
+            padding: 0.35rem 0.7rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .bottom-bar .tracker-pill.active {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+
+        .bottom-bar .btn-reset-sm {
+            background: #fff;
+            color: #ef4444;
+            border: 2px solid #fecaca;
+            padding: 0.5rem 1.2rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .bottom-bar .btn-reset-sm:hover {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        /* Hide old info-panel completely */
+        .info-panel {
+            display: none !important;
+        }
+
+        /* Slim header for touchscreen */
+        .page-header {
+            padding: 0.8rem 0 0.4rem 0 !important;
+        }
+        .page-title {
+            font-size: 1.8rem !important;
+            margin-bottom: 0 !important;
+        }
+        .page-subtitle {
+            font-size: 0.9rem !important;
+            margin-bottom: 0 !important;
+        }
+
+        /* Tabs compact */
+        .board-selector {
+            margin-bottom: 0.5rem !important;
+            padding: 0 !important;
+        }
+
+        /* Make body pad for bottom bar */
+        body {
+            padding-bottom: 60px;
+        }
+
+        /* Hide old footer and navbar on this page */
+        .footer, #navbar {
+            display: none !important;
+        }
+
+        /* Touch-friendly: enlarge touch area on cells */
+        .bingo-cell {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Embark <span>啟程</span></a>
+            <div style="display: flex; gap: 10px;">
+                <a href="index.html" class="btn primary-btn" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">返回首頁</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">海報決賽互動賓果</h1>
+            <p class="page-subtitle">點亮你的專題航紀 ✦ 驚喜連線之旅</p>
+        </div>
+    </div>
+
+    <!-- Board Selector Tabs -->
+    <div class="board-selector">
+        <button class="board-tab active" id="tab-a" onclick="switchBoard('A')">賓果卡一 (大師對談)</button>
+        <button class="board-tab tab-blue" id="tab-b" onclick="switchBoard('B')">賓果卡二 (跨界對話)</button>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="bingo-layout" id="bingo-layout-container">
+        
+        <!-- Left: Bingo Grid Board -->
+        <div class="board-container">
+            <div class="board-wrapper theme-orange" id="board-wrapper">
+                <!-- SVG Line Overlays -->
+                <svg class="bingo-svg" viewBox="0 0 1920 1080">
+                    <defs>
+                        <linearGradient id="glow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <!-- Colors set dynamically based on theme -->
+                            <stop offset="0%" stop-color="#FF8C42" />
+                            <stop offset="100%" stop-color="#FFD700" />
+                        </linearGradient>
+                        <filter id="glow-filter" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="8" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <!-- Horizontal Rows (Row 0 to 3) -->
+                    <line id="line-r0" class="bingo-line" x1="410" y1="110" x2="1270" y2="110" />
+                    <line id="line-r1" class="bingo-line" x1="410" y1="320" x2="1270" y2="320" />
+                    <line id="line-r2" class="bingo-line" x1="410" y1="530" x2="1270" y2="530" />
+                    <line id="line-r3" class="bingo-line" x1="410" y1="740" x2="1270" y2="740" />
+                    
+                    <!-- Vertical Columns (Col 0 to 3) -->
+                    <line id="line-c0" class="bingo-line" x1="510" y1="20" x2="510" y2="830" />
+                    <line id="line-c1" class="bingo-line" x1="730" y1="20" x2="730" y2="830" />
+                    <line id="line-c2" class="bingo-line" x1="950" y1="20" x2="950" y2="830" />
+                    <line id="line-c3" class="bingo-line" x1="1170" y1="20" x2="1170" y2="830" />
+                </svg>
+
+                <!-- Interactive overlay hotspots for the 5x5 grid -->
+                <!-- 16 Text cells (Idx 0-15) -->
+                <!-- Row 0 -->
+                <div class="bingo-cell text-cell" data-idx="0" style="left: 21.3542%; top: 1.8519%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="1" style="left: 32.8125%; top: 1.8519%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="2" style="left: 44.2708%; top: 1.8519%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="3" style="left: 55.7292%; top: 1.8519%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <!-- Row 1 -->
+                <div class="bingo-cell text-cell" data-idx="4" style="left: 21.3542%; top: 21.2963%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="5" style="left: 32.8125%; top: 21.2963%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="6" style="left: 44.2708%; top: 21.2963%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="7" style="left: 55.7292%; top: 21.2963%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <!-- Row 2 -->
+                <div class="bingo-cell text-cell" data-idx="8" style="left: 21.3542%; top: 40.7407%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="9" style="left: 32.8125%; top: 40.7407%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="10" style="left: 44.2708%; top: 40.7407%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="11" style="left: 55.7292%; top: 40.7407%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <!-- Row 3 -->
+                <div class="bingo-cell text-cell" data-idx="12" style="left: 21.3542%; top: 60.1852%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="13" style="left: 32.8125%; top: 60.1852%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="14" style="left: 44.2708%; top: 60.1852%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="bingo-cell text-cell" data-idx="15" style="left: 55.7292%; top: 60.1852%; width: 10.4167%; height: 16.6667%;">
+                    <div class="cell-check"><i class="fas fa-check"></i></div>
+                </div>
+
+                <!-- 8 Gift Cells (4 Right Column, 4 Bottom Row) -->
+                <!-- Right column row-control gifts -->
+                <div class="bingo-cell gift-cell" data-gift-type="row" data-gift-idx="0" style="left: 67.1875%; top: 1.8519%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+                <div class="bingo-cell gift-cell" data-gift-type="row" data-gift-idx="1" style="left: 67.1875%; top: 21.2963%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+                <div class="bingo-cell gift-cell" data-gift-type="row" data-gift-idx="2" style="left: 67.1875%; top: 40.7407%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+                <div class="bingo-cell gift-cell" data-gift-type="row" data-gift-idx="3" style="left: 67.1875%; top: 60.1852%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+                <!-- Bottom row col-control gifts -->
+                <div class="bingo-cell gift-cell" data-gift-type="col" data-gift-idx="0" style="left: 21.3542%; top: 79.6296%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+                <div class="bingo-cell gift-cell" data-gift-type="col" data-gift-idx="1" style="left: 32.8125%; top: 79.6296%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+                <div class="bingo-cell gift-cell" data-gift-type="col" data-gift-idx="2" style="left: 44.2708%; top: 79.6296%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+                <div class="bingo-cell gift-cell" data-gift-type="col" data-gift-idx="3" style="left: 55.7292%; top: 79.6296%; width: 10.4167%; height: 16.6667%;">
+                    <div class="gift-icon-overlay"><i class="fas fa-gift"></i></div>
+                </div>
+
+                <!-- Bottom-Right Corner Card (3D Flip Card) -->
+                <div class="bingo-cell corner-card" id="corner-card" style="left: 67.1875%; top: 79.6296%; width: 10.4167%; height: 16.6667%;">
+                    <div class="card-inner" id="corner-card-inner">
+                        <div class="card-front"></div>
+                        <div class="card-back">
+                            <img src="images/center_logo.png" alt="Embark Logo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Info Panel (hidden, kept for JS references) -->
+        <div class="info-panel" id="info-panel-container">
+            <div class="tracker-grid">
+                <div class="tracker-item" id="track-r0"><i class="far fa-circle"></i> 第一橫列</div>
+                <div class="tracker-item" id="track-r1"><i class="far fa-circle"></i> 第二橫列</div>
+                <div class="tracker-item" id="track-r2"><i class="far fa-circle"></i> 第三橫列</div>
+                <div class="tracker-item" id="track-r3"><i class="far fa-circle"></i> 第四橫列</div>
+                <div class="tracker-item" id="track-c0"><i class="far fa-circle"></i> 第一直行</div>
+                <div class="tracker-item" id="track-c1"><i class="far fa-circle"></i> 第二直行</div>
+                <div class="tracker-item" id="track-c2"><i class="far fa-circle"></i> 第三直行</div>
+                <div class="tracker-item" id="track-c3"><i class="far fa-circle"></i> 第四直行</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Bottom Control Bar -->
+    <div class="bottom-bar">
+        <div class="stat-chip">
+            <i class="fas fa-trophy"></i>
+            <span>連線 <span id="line-count">0</span> / 8</span>
+        </div>
+        <div class="tracker-pills">
+            <span class="tracker-pill" id="pill-r0">橫1</span>
+            <span class="tracker-pill" id="pill-r1">橫2</span>
+            <span class="tracker-pill" id="pill-r2">橫3</span>
+            <span class="tracker-pill" id="pill-r3">橫4</span>
+            <span class="tracker-pill" id="pill-c0">直1</span>
+            <span class="tracker-pill" id="pill-c1">直2</span>
+            <span class="tracker-pill" id="pill-c2">直3</span>
+            <span class="tracker-pill" id="pill-c3">直4</span>
+        </div>
+        <button class="btn-reset-sm" onclick="confirmReset()"><i class="fas fa-undo"></i> 重置</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="text-align: center; padding: 2rem; color: var(--text-light); font-size: 0.85rem; background: #fff; border-top: 1px solid #e2e8f0; margin-top: auto;">
+        <p>高雄市立三民高級中學 第六屆專題成果展 &copy; 2025 Embark 啟程</p>
+    </footer>
+
+    <!-- Game Scripts -->
+    <script>
+        // Store cell states separately for Board A and Board B in localStorage
+        const STORAGE_KEY_PREFIX = 'embark_bingo_state_v2_';
+        let currentBoard = 'A'; // 'A' or 'B'
+        
+        // State model: 16 text cells (booleans) + 1 corner cell (boolean)
+        let cellStates = Array(16).fill(false);
+        let cornerState = false;
+
+        // Define the 8 possible bingo winning lines (4 rows, 4 columns, no diagonals)
+        const lines = [
+            { id: 'r0', name: '第一橫列', cells: [0, 1, 2, 3], lineId: 'line-r0', trackId: 'track-r0' },
+            { id: 'r1', name: '第二橫列', cells: [4, 5, 6, 7], lineId: 'line-r1', trackId: 'track-r1' },
+            { id: 'r2', name: '第三橫列', cells: [8, 9, 10, 11], lineId: 'line-r2', trackId: 'track-r2' },
+            { id: 'r3', name: '第四橫列', cells: [12, 13, 14, 15], lineId: 'line-r3', trackId: 'track-r3' },
+            { id: 'c0', name: '第一直行', cells: [0, 4, 8, 12], lineId: 'line-c0', trackId: 'track-c0' },
+            { id: 'c1', name: '第二直行', cells: [1, 5, 9, 13], lineId: 'line-c1', trackId: 'track-c1' },
+            { id: 'c2', name: '第三直行', cells: [2, 6, 10, 14], lineId: 'line-c2', trackId: 'track-c2' },
+            { id: 'c3', name: '第四直行', cells: [3, 7, 11, 15], lineId: 'line-c3', trackId: 'track-c3' }
+        ];
+
+        // Switch boards (Tab A = Orange, Tab B = Blue)
+        function switchBoard(boardId) {
+            if (currentBoard === boardId) return;
+            
+            // Update tabs active state
+            document.getElementById('tab-a').classList.toggle('active', boardId === 'A');
+            document.getElementById('tab-b').classList.toggle('active', boardId === 'B');
+            
+            // Update wrapper class for theme styles
+            const wrapper = document.getElementById('board-wrapper');
+            const layout = document.getElementById('bingo-layout-container');
+            if (boardId === 'A') {
+                wrapper.className = 'board-wrapper theme-orange';
+                layout.className = 'bingo-layout'; // resets theme color classes on container
+                // Update SVG gradient stops
+                document.querySelector('#glow-grad stop:first-child').setAttribute('stop-color', '#FF8C42');
+                document.querySelector('#glow-grad stop:last-child').setAttribute('stop-color', '#FFD700');
+            } else {
+                wrapper.className = 'board-wrapper theme-blue';
+                layout.className = 'bingo-layout theme-blue-ui';
+                // Update SVG gradient stops
+                document.querySelector('#glow-grad stop:first-child').setAttribute('stop-color', '#3B82F6');
+                document.querySelector('#glow-grad stop:last-child').setAttribute('stop-color', '#22D3EE');
+            }
+            
+            currentBoard = boardId;
+            loadState();
+        }
+
+        // Load state from localStorage
+        function loadState() {
+            const storedCells = localStorage.getItem(STORAGE_KEY_PREFIX + currentBoard + '_cells');
+            const storedCorner = localStorage.getItem(STORAGE_KEY_PREFIX + currentBoard + '_corner');
+            
+            if (storedCells) {
+                try {
+                    cellStates = JSON.parse(storedCells);
+                } catch(e) {
+                    cellStates = Array(16).fill(false);
+                }
+            } else {
+                cellStates = Array(16).fill(false);
+            }
+            
+            cornerState = storedCorner === 'true';
+            
+            updateUI();
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY_PREFIX + currentBoard + '_cells', JSON.stringify(cellStates));
+            localStorage.setItem(STORAGE_KEY_PREFIX + currentBoard + '_corner', cornerState.toString());
+        }
+
+        // Toggle text cell selection
+        function toggleCell(idx) {
+            cellStates[idx] = !cellStates[idx];
+            saveState();
+            updateUI();
+            
+            if (cellStates[idx]) {
+                const cellEl = document.querySelector(`.text-cell[data-idx="${idx}"]`);
+                const rect = cellEl.getBoundingClientRect();
+                spawnLocalParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
+        }
+
+        // Toggle entire row or column via gift card click
+        function toggleGiftLine(type, index) {
+            let cellsInLine = [];
+            if (type === 'row') {
+                cellsInLine = [index * 4, index * 4 + 1, index * 4 + 2, index * 4 + 3];
+            } else {
+                cellsInLine = [index, index + 4, index + 8, index + 12];
+            }
+            
+            // Check if line is already fully completed
+            const isFullyCompleted = cellsInLine.every(idx => cellStates[idx]);
+            
+            // Toggle all cells in this line
+            cellsInLine.forEach(idx => {
+                cellStates[idx] = !isFullyCompleted;
+            });
+            
+            saveState();
+            updateUI();
+            
+            // If the line was completed, spawn particles at the gift box!
+            if (!isFullyCompleted) {
+                const giftEl = document.querySelector(`.gift-cell[data-gift-type="${type}"][data-gift-idx="${index}"]`);
+                const rect = giftEl.getBoundingClientRect();
+                spawnLocalParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
+        }
+
+        // Toggle corner card
+        function toggleCorner() {
+            cornerState = !cornerState;
+            saveState();
+            updateUI();
+            
+            if (cornerState) {
+                const cornerEl = document.getElementById('corner-card');
+                const rect = cornerEl.getBoundingClientRect();
+                spawnLocalParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                triggerCelebration();
+            }
+        }
+
+        // Update UI displays
+        let lastCompletedLinesCount = 0;
+        function updateUI() {
+            let activeLinesCount = 0;
+            
+            // Check completed rows and cols
+            const completedRows = [];
+            for (let r = 0; r < 4; r++) {
+                const isRowCompleted = [r*4, r*4+1, r*4+2, r*4+3].every(idx => cellStates[idx]);
+                completedRows.push(isRowCompleted);
+            }
+            const completedCols = [];
+            for (let c = 0; c < 4; c++) {
+                const isColCompleted = [c, c+4, c+8, c+12].every(idx => cellStates[idx]);
+                completedCols.push(isColCompleted);
+            }
+
+            // 1. Update text cells
+            cellStates.forEach((isCompleted, idx) => {
+                const cellEl = document.querySelector(`.text-cell[data-idx="${idx}"]`);
+                if (cellEl) {
+                    cellEl.classList.toggle('completed', isCompleted);
+                    
+                    const row = Math.floor(idx / 4);
+                    const col = idx % 4;
+                    
+                    cellEl.classList.toggle('in-completed-row', completedRows[row]);
+                    cellEl.classList.toggle('in-completed-col', completedCols[col]);
+                }
+            });
+
+            // 2. Update corner card flip state
+            const cornerEl = document.getElementById('corner-card');
+            const cornerInner = document.getElementById('corner-card-inner');
+            if (cornerState) {
+                cornerEl.classList.add('completed');
+                cornerInner.classList.add('flipped');
+            } else {
+                cornerEl.classList.remove('completed');
+                cornerInner.classList.remove('flipped');
+            }
+
+            // 3. Update lines and tracking checklist
+            lines.forEach(line => {
+                const isLineCompleted = line.cells.every(idx => cellStates[idx]);
+                const lineEl = document.getElementById(line.lineId);
+                const trackEl = document.getElementById(line.trackId);
+                
+                if (isLineCompleted) {
+                    activeLinesCount++;
+                    lineEl.classList.add('active');
+                    trackEl.classList.add('active');
+                    trackEl.querySelector('i').className = 'fas fa-check-circle';
+                } else {
+                    lineEl.classList.remove('active');
+                    trackEl.classList.remove('active');
+                    trackEl.querySelector('i').className = 'far fa-circle';
+                }
+            });
+
+            // 4. Update gift box cards completion state
+            // Right Row Gifts
+            for (let r = 0; r < 4; r++) {
+                const giftRowEl = document.querySelector(`.gift-cell[data-gift-type="row"][data-gift-idx="${r}"]`);
+                const isRowCompleted = [r*4, r*4+1, r*4+2, r*4+3].every(idx => cellStates[idx]);
+                giftRowEl.classList.toggle('completed', isRowCompleted);
+            }
+            // Bottom Col Gifts
+            for (let c = 0; c < 4; c++) {
+                const giftColEl = document.querySelector(`.gift-cell[data-gift-type="col"][data-gift-idx="${c}"]`);
+                const isColCompleted = [c, c+4, c+8, c+12].every(idx => cellStates[idx]);
+                giftColEl.classList.toggle('completed', isColCompleted);
+            }
+
+            // 5. Update completed count display
+            document.getElementById('line-count').innerText = activeLinesCount;
+
+            // 6. Update bottom bar tracker pills
+            lines.forEach(line => {
+                const pillEl = document.getElementById('pill-' + line.id);
+                if (pillEl) {
+                    const isLineCompleted = line.cells.every(idx => cellStates[idx]);
+                    pillEl.classList.toggle('active', isLineCompleted);
+                }
+            });
+            
+            // Trigger confetti if line count increased
+            if (activeLinesCount > lastCompletedLinesCount) {
+                triggerCelebration();
+            }
+            lastCompletedLinesCount = activeLinesCount;
+        }
+
+        // Reset Board state
+        function confirmReset() {
+            if (confirm('確定要重置目前的賓果盤嗎？所有點亮的進度將會歸零。')) {
+                cellStates = Array(16).fill(false);
+                cornerState = false;
+                saveState();
+                updateUI();
+            }
+        }
+
+        // Click listeners setup
+        document.querySelectorAll('.text-cell').forEach(cell => {
+            cell.addEventListener('click', () => {
+                const idx = parseInt(cell.getAttribute('data-idx'));
+                toggleCell(idx);
+            });
+        });
+
+        document.querySelectorAll('.gift-cell').forEach(gift => {
+            gift.addEventListener('click', () => {
+                const type = gift.getAttribute('data-gift-type');
+                const idx = parseInt(gift.getAttribute('data-gift-idx'));
+                toggleGiftLine(type, idx);
+            });
+        });
+
+        document.getElementById('corner-card').addEventListener('click', () => {
+            toggleCorner();
+        });
+
+
+        // ================= CONFETTI & PARTICLE CELEBRATION ENGINE =================
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, isMajor = false) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * (isMajor ? 8 : 5) + 4;
+                this.color = this.getRandomColor();
+                this.speedX = Math.random() * 8 - 4;
+                this.speedY = isMajor ? (Math.random() * -12 - 5) : (Math.random() * -5 - 2);
+                this.gravity = Math.random() * 0.15 + 0.1;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 6 - 3;
+                this.shape = Math.random() > 0.5 ? 'star' : (Math.random() > 0.4 ? 'circle' : 'square');
+                this.opacity = 1;
+                this.fadeOutSpeed = Math.random() * 0.015 + 0.008;
+            }
+
+            getRandomColor() {
+                const paletteA = [
+                    '#FF8C42', // Warm Orange
+                    '#FFD700', // Gold
+                    '#10B981', // Emerald
+                    '#EC4899', // Pink
+                    '#F59E0B', // Amber
+                    '#E0F2FE'  // Ice Blue
+                ];
+                const paletteB = [
+                    '#3B82F6', // Sky Blue
+                    '#22D3EE', // Cyan
+                    '#8B5CF6', // Purple
+                    '#10B981', // Emerald
+                    '#EC4899', // Pink
+                    '#E0F2FE'  // Ice Blue
+                ];
+                const palette = currentBoard === 'A' ? paletteA : paletteB;
+                return palette[Math.floor(Math.random() * palette.length)];
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += this.gravity;
+                this.rotation += this.rotationSpeed;
+                this.opacity -= this.fadeOutSpeed;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate((this.rotation * Math.PI) / 180);
+                ctx.globalAlpha = Math.max(0, this.opacity);
+                ctx.fillStyle = this.color;
+
+                if (this.shape === 'star') {
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        ctx.lineTo(Math.cos(((18 + i * 72) * Math.PI) / 180) * this.size,
+                                   Math.sin(((18 + i * 72) * Math.PI) / 180) * this.size);
+                        ctx.lineTo(Math.cos(((54 + i * 72) * Math.PI) / 180) * (this.size / 2),
+                                   Math.sin(((54 + i * 72) * Math.PI) / 180) * (this.size / 2));
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (this.shape === 'circle') {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                }
+                ctx.restore();
+            }
+        }
+
+        function spawnLocalParticles(x, y) {
+            for (let i = 0; i < 15; i++) {
+                particles.push(new Particle(x, y, false));
+            }
+            if (!animationFrameId) {
+                loop();
+            }
+        }
+
+        function triggerCelebration() {
+            // Spawn particles from bottom-left corner
+            for (let i = 0; i < 60; i++) {
+                particles.push(new Particle(50, window.innerHeight - 50, true));
+            }
+            // Spawn particles from bottom-right corner
+            for (let i = 0; i < 60; i++) {
+                particles.push(new Particle(window.innerWidth - 50, window.innerHeight - 50, true));
+            }
+            if (!animationFrameId) {
+                loop();
+            }
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach((p, idx) => {
+                p.update();
+                p.draw();
+                if (p.opacity <= 0 || p.y > window.innerHeight) {
+                    particles.splice(idx, 1);
+                }
+            });
+
+            if (particles.length > 0) {
+                animationFrameId = requestAnimationFrame(loop);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                animationFrameId = null;
+            }
+        }
+
+        // Init page state
+        window.addEventListener('DOMContentLoaded', loadState);
+    </script>
+</body>
+</html>
